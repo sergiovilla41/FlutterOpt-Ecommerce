@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Página de la categoría "joyería"
 class joyeria extends StatefulWidget {
   joyeria({Key? key}) : super(key: key);
 
@@ -15,9 +16,10 @@ class _joyeriaState extends State<joyeria> {
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchProducts(); // Llama a la función para obtener productos al inicializar
   }
 
+  // Función para obtener productos de la categoría "joyería" desde una API
   Future<void> fetchProducts() async {
     final response = await http
         .get(Uri.parse('https://fakestoreapi.com/products/category/jewelery'));
@@ -37,7 +39,7 @@ class _joyeriaState extends State<joyeria> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' Joyería',
+          ' Joyería', // Título de la página de joyería
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -73,7 +75,7 @@ class _joyeriaState extends State<joyeria> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Store:',
+              'Store:', // Encabezado de la tienda
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
@@ -97,6 +99,7 @@ class _joyeriaState extends State<joyeria> {
   }
 }
 
+// Modelo de Producto
 class Product {
   final int id;
   final String title;
@@ -114,6 +117,7 @@ class Product {
     required this.image,
   });
 
+  // Constructor de Product desde JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
@@ -126,6 +130,7 @@ class Product {
   }
 }
 
+// Widget para mostrar un producto
 class ProductCard extends StatelessWidget {
   final Product product;
 
@@ -179,6 +184,7 @@ class ProductCard extends StatelessWidget {
   }
 }
 
+// Función principal para iniciar la aplicación con la página de joyería
 void main() {
   runApp(MaterialApp(
     home: joyeria(),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app_optativa/src/Pages/sing_in.dart';
-
 import 'package:mi_app_optativa/src/Widgets/icon_container.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,11 +15,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Construye una página con una estructura de diseño específica
     return Scaffold(
       body: Container(
+        // Ocupa todo el ancho y alto disponible
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
+          // Aplica un degradado como fondo
           gradient: LinearGradient(
             colors: <Color>[
               Color.fromARGB(255, 9, 73, 36),
@@ -30,14 +32,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         child: ListView(
+          // Añade un padding alrededor de la lista
           padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 200),
           children: <Widget>[
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                // Widget personalizado que muestra un icono
                 IconContainer(
                   url: '../images/oso.png',
                 ),
+                // Texto de bienvenida
                 Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -45,9 +50,11 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 38.0,
                   ),
                 ),
+                // Separador
                 Divider(
                   height: 20.0,
                 ),
+                // Campo de texto para el nombre de usuario
                 SizedBox(
                   width: double.infinity,
                   height: 60.0,
@@ -70,6 +77,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 20.0,
                 ),
+                // Campo de texto para la contraseña
                 SizedBox(
                   width: double.infinity,
                   height: 60.0,
@@ -94,6 +102,7 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   height: 60.0,
                   child: TextButton(
+                    // Define un estilo para el botón
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.resolveWith<double>(
                         (Set<MaterialState> states) {
@@ -107,14 +116,16 @@ class _HomePageState extends State<HomePage> {
                           const Color.fromARGB(146, 105, 240, 175)),
                     ),
                     onPressed: () {
+                      // Acción al presionar el botón de inicio de sesión
                       final route = MaterialPageRoute(
                         builder: (context) => SingIn(
                             username: _usernameController.text,
                             password: _passwordController.text),
                       );
+                      // Navega a la página de inicio de sesión
                       Navigator.push(context, route);
 
-                      // Mostrar ventana emergente de "acceso concedido"
+                      // Muestra una ventana emergente de "acceso concedido"
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -138,6 +149,7 @@ class _HomePageState extends State<HomePage> {
                             actions: [
                               TextButton(
                                 onPressed: () {
+                                  // Cierra la ventana emergente
                                   Navigator.of(context).pop();
                                 },
                                 child: Text(
@@ -153,6 +165,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       );
                     },
+                    // Texto del botón
                     child: Text(
                       'Sign In',
                       style: TextStyle(

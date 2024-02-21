@@ -25,6 +25,7 @@ class _SingInState extends State<SingIn> {
     fetchProducts();
   }
 
+  // Función para obtener productos de una API
   Future<void> fetchProducts() async {
     final response =
         await http.get(Uri.parse('https://fakestoreapi.com/products'));
@@ -107,6 +108,7 @@ class _SingInState extends State<SingIn> {
   }
 }
 
+// Modelo de Producto
 class Product {
   final int id;
   final String title;
@@ -124,6 +126,7 @@ class Product {
     required this.image,
   });
 
+  // Constructor de Product desde JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
@@ -136,6 +139,7 @@ class Product {
   }
 }
 
+// Widget para mostrar un producto
 class ProductCard extends StatelessWidget {
   final Product product;
 
@@ -189,6 +193,7 @@ class ProductCard extends StatelessWidget {
   }
 }
 
+// Widget para el menú desplegable personalizado
 class CustomPopupMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -270,6 +275,7 @@ class CustomPopupMenuButton extends StatelessWidget {
   }
 }
 
+// Páginas de categorías
 class JewelryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -313,6 +319,7 @@ class ClothingPage extends StatelessWidget {
 }
 
 void main() {
+  // Inicializa la aplicación con la página de inicio de sesión
   runApp(MaterialApp(
     home: SingIn(
       username: 'Usuario',

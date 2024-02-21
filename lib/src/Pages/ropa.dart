@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Página de la categoría "ropa"
 class ropa extends StatefulWidget {
   ropa({Key? key}) : super(key: key);
 
@@ -15,9 +16,10 @@ class _ropaState extends State<ropa> {
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchProducts(); // Llama a la función para obtener productos al inicializar
   }
 
+  // Función para obtener productos de la categoría "ropa" desde una API
   Future<void> fetchProducts() async {
     final response = await http.get(Uri.parse(
         'https://fakestoreapi.com/products/category/men\'s clothing'));
@@ -37,7 +39,7 @@ class _ropaState extends State<ropa> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' Ropa',
+          ' Ropa', // Título de la página de ropa
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -73,7 +75,7 @@ class _ropaState extends State<ropa> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Store:',
+              'Store:', // Encabezado de la tienda
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
@@ -97,6 +99,7 @@ class _ropaState extends State<ropa> {
   }
 }
 
+// Modelo de Producto
 class Product {
   final int id;
   final String title;
@@ -114,6 +117,7 @@ class Product {
     required this.image,
   });
 
+  // Constructor de Product desde JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
@@ -126,6 +130,7 @@ class Product {
   }
 }
 
+// Widget para mostrar un producto
 class ProductCard extends StatelessWidget {
   final Product product;
 
@@ -179,6 +184,7 @@ class ProductCard extends StatelessWidget {
   }
 }
 
+// Función principal para iniciar la aplicación con la página de ropa
 void main() {
   runApp(MaterialApp(
     home: ropa(),
