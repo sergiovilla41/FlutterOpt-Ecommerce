@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mi_app_optativa/src/Pages/joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'dart:convert';
+
+import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
 
 class SingIn extends StatefulWidget {
   final String username;
 
-  SingIn({Key? key, required this.username}) : super(key: key);
+  SingIn({Key? key, required this.username, required String password})
+      : super(key: key);
 
   @override
   _SingInState createState() => _SingInState();
@@ -39,7 +44,7 @@ class _SingInState extends State<SingIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bienvenido: ${widget.username}',
+          'User: ${widget.username}',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -51,6 +56,15 @@ class _SingInState extends State<SingIn> {
             Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
         actions: [
           CustomPopupMenuButton(),
+          IconButton(
+            onPressed: () {
+              // Acción al presionar el icono del carrito
+            },
+            icon: Icon(
+              Icons.shopping_cart, // Icono del carrito de compras
+              color: Colors.white, // Color del icono
+            ),
+          ),
         ],
       ),
       body: Container(
@@ -184,19 +198,19 @@ class CustomPopupMenuButton extends StatelessWidget {
           case 'joyeria':
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => JewelryPage()),
+              MaterialPageRoute(builder: (context) => joyeria()),
             );
             break;
           case 'tecnologia':
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TechnologyPage()),
+              MaterialPageRoute(builder: (context) => tecnologia()),
             );
             break;
           case 'ropa':
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ClothingPage()),
+              MaterialPageRoute(builder: (context) => ropa()),
             );
             break;
         }
@@ -300,6 +314,9 @@ class ClothingPage extends StatelessWidget {
 
 void main() {
   runApp(MaterialApp(
-    home: SingIn(username: 'Usuario'),
+    home: SingIn(
+      username: 'Usuario',
+      password: '',
+    ),
   ));
 }

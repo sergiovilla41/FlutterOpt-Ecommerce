@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,29 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(
+                  height: 20.0,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 60.0,
+                  child: TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                      errorText: _passwordController.text.isEmpty
+                          ? 'Password is required'
+                          : null,
+                    ),
+                  ),
+                ),
+                SizedBox(
                   width: double.infinity,
                   height: 60.0,
                   child: TextButton(
@@ -84,13 +108,53 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onPressed: () {
                       final route = MaterialPageRoute(
-                        builder: (context) =>
-                            SingIn(username: _usernameController.text),
+                        builder: (context) => SingIn(
+                            username: _usernameController.text,
+                            password: _passwordController.text),
                       );
                       Navigator.push(context, route);
+
+                      // Mostrar ventana emergente de "acceso concedido"
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              'Acceso concedido',
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 56, 83, 30),
+                                fontFamily: 'FredokaOne',
+                                fontSize:
+                                    20.0, // Tamaño de la fuente para el título
+                              ),
+                            ),
+                            content: Text(
+                              'Welcome ${_usernameController.text}!',
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 56, 83, 30),
+                                fontFamily: 'FredokaOne',
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  'Close',
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 56, 83, 30),
+                                    fontFamily: 'FredokaOne',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     child: Text(
-                      'Sing In',
+                      'Sign In',
                       style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'FredokaOne',

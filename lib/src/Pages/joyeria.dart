@@ -37,16 +37,26 @@ class _joyeriaState extends State<joyeria> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Store Joyería',
+          ' Joyería',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
-            color: Color.fromARGB(
-                255, 232, 235, 232), // Color del texto del AppBar
+            color: Colors.white, // Color del texto del AppBar
           ),
         ),
         backgroundColor:
             Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Acción al presionar el icono del carrito
+            },
+            icon: Icon(
+              Icons.shopping_cart, // Icono del carrito de compras
+              color: Colors.white, // Color del icono
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -63,11 +73,11 @@ class _joyeriaState extends State<joyeria> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Productos:',
+              'Store:',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
-                color: Color.fromARGB(255, 9, 73, 36),
+                color: Color.fromARGB(255, 225, 228, 226),
               ),
             ),
             SizedBox(height: 30),
