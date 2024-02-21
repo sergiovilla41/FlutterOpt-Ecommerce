@@ -3,7 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SingIn extends StatefulWidget {
-  SingIn({Key? key}) : super(key: key);
+  final String username; // Añade esta línea
+
+  SingIn({Key? key, required this.username})
+      : super(key: key); // Modifica el constructor
 
   @override
   _SingInState createState() => _SingInState();
@@ -37,7 +40,7 @@ class _SingInState extends State<SingIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Store Optativa',
+          'Bienvenido: ${widget.username}!', // Usa el nombre de usuario aquí
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -46,12 +49,6 @@ class _SingInState extends State<SingIn> {
         ),
         actions: [
           CustomPopupMenuButton(),
-          IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Acción para mostrar el carrito
-            },
-          ),
         ],
       ),
       body: Container(
@@ -88,12 +85,6 @@ class _SingInState extends State<SingIn> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context); // Regresar a la pantalla de inicio (Home)
-        },
-        child: Icon(Icons.arrow_back),
       ),
     );
   }

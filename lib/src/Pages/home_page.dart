@@ -60,6 +60,9 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                      errorText: _usernameController.text.isEmpty
+                          ? 'Username is required'
+                          : null,
                     ),
                   ),
                 ),
@@ -81,7 +84,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onPressed: () {
                       final route = MaterialPageRoute(
-                        builder: (context) => SingIn(),
+                        builder: (context) =>
+                            SingIn(username: _usernameController.text),
                       );
                       Navigator.push(context, route);
                     },

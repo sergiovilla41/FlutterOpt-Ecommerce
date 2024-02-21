@@ -24,8 +24,8 @@ class LoginApp extends StatelessWidget {
       initialRoute: 'Home',
       routes: <String, WidgetBuilder>{
         'Home': (BuildContext context) => HomePage(),
-        'Sing In': (BuildContext context) => SingIn(),
-        'Sing Up': (BuildContext context) => SingUp(),
+        'SingIn': (BuildContext context) => SingIn(username: ''),
+        'SingUp': (BuildContext context) => SingUp(),
       },
     );
   }
