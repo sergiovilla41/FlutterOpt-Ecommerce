@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mi_app_optativa/src/Pages/home_page.dart';
+import 'package:mi_app_optativa/src/Pages/joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'package:mi_app_optativa/src/Pages/sing_in.dart';
-import 'package:mi_app_optativa/src/Pages/sing_up.dart';
+import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
 
 void main() {
   runApp(LoginApp());
@@ -25,7 +27,9 @@ class LoginApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         'Home': (BuildContext context) => HomePage(),
         'SingIn': (BuildContext context) => SingIn(username: ''),
-        'SingUp': (BuildContext context) => SingUp(),
+        'Tecnología': (BuildContext context) => tecnologia(),
+        'Joyería': (BuildContext context) => joyeria(),
+        'Ropa': (BuildContext context) => ropa(),
       },
     );
   }

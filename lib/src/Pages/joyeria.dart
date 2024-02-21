@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class SingIn extends StatefulWidget {
-  final String username;
-
-  SingIn({Key? key, required this.username}) : super(key: key);
+class joyeria extends StatefulWidget {
+  joyeria({Key? key}) : super(key: key);
 
   @override
-  _SingInState createState() => _SingInState();
+  _joyeriaState createState() => _joyeriaState();
 }
 
-class _SingInState extends State<SingIn> {
+class _joyeriaState extends State<joyeria> {
   List<Product> products = [];
 
   @override
@@ -21,8 +19,8 @@ class _SingInState extends State<SingIn> {
   }
 
   Future<void> fetchProducts() async {
-    final response =
-        await http.get(Uri.parse('https://fakestoreapi.com/products'));
+    final response = await http
+        .get(Uri.parse('https://fakestoreapi.com/products/category/jewelery'));
     if (response.statusCode == 200) {
       setState(() {
         products = (json.decode(response.body) as List)
@@ -39,7 +37,7 @@ class _SingInState extends State<SingIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bienvenido: ${widget.username}',
+          'Store Joyería',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -49,9 +47,6 @@ class _SingInState extends State<SingIn> {
         ),
         backgroundColor:
             Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
-        actions: [
-          CustomPopupMenuButton(),
-        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -68,15 +63,14 @@ class _SingInState extends State<SingIn> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Store', // Agregar "Store" encima de las tarjetas
+              'Productos:',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
-                fontSize: 30,
-                color: Color.fromARGB(255, 238, 240, 239),
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Color.fromARGB(255, 9, 73, 36),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
                 itemCount: products.length,
@@ -175,131 +169,8 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-class CustomPopupMenuButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-        switch (value) {
-          case 'joyeria':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => JewelryPage()),
-            );
-            break;
-          case 'tecnologia':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TechnologyPage()),
-            );
-            break;
-          case 'ropa':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ClothingPage()),
-            );
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'joyeria',
-          child: Text(
-            'Joyería',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'tecnologia',
-          child: Text(
-            'Tecnología',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'ropa',
-          child: Text(
-            'Ropa',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
-            ),
-          ),
-        ),
-      ],
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              'Menú',
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 20,
-                color: Color.fromARGB(255, 232, 235, 232),
-              ),
-            ),
-          ),
-          Icon(Icons.arrow_drop_down),
-        ],
-      ),
-    );
-  }
-}
-
-class JewelryPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Joyería'),
-      ),
-      body: Center(
-        child: Text('Página de Joyería'),
-      ),
-    );
-  }
-}
-
-class TechnologyPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tecnología'),
-      ),
-      body: Center(
-        child: Text('Página de Tecnología'),
-      ),
-    );
-  }
-}
-
-class ClothingPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ropa'),
-      ),
-      body: Center(
-        child: Text('Página de Ropa'),
-      ),
-    );
-  }
-}
-
 void main() {
   runApp(MaterialApp(
-    home: SingIn(username: 'Usuario'),
+    home: joyeria(),
   ));
 }
