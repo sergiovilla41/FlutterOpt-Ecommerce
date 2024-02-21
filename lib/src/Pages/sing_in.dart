@@ -1,44 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// Importa el widget de icono
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Color.fromARGB(
-            255, 9, 73, 36), // Color de fondo de la barra de navegación
-        hintColor:
-            Color.fromARGB(146, 105, 240, 175), // Color de fondo del botón
-        scaffoldBackgroundColor:
-            Color.fromARGB(255, 9, 73, 36), // Color de fondo de la página
-        textTheme: TextTheme(
-          headline6: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 20,
-            color: Color.fromARGB(255, 9, 73, 36), // Color de texto principal
-          ),
-          subtitle1: TextStyle(
-            fontSize: 16,
-            color: Color.fromARGB(255, 9, 73, 36), // Color de texto secundario
-          ),
-          button: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 16,
-            color: Colors.white, // Color de texto del botón
-          ),
-        ),
-      ),
-      home: SingIn(),
-    );
-  }
-}
+import 'dart:convert';
 
 class SingIn extends StatefulWidget {
   SingIn({Key? key}) : super(key: key);
@@ -74,7 +36,14 @@ class _SingInState extends State<SingIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Store Optativa'),
+        title: Text(
+          'Store Optativa',
+          style: TextStyle(
+            fontFamily: 'FredokaOne',
+            fontSize: 20,
+            color: Color.fromARGB(255, 9, 73, 36),
+          ),
+        ),
         actions: [
           CustomPopupMenuButton(),
           IconButton(
@@ -86,13 +55,26 @@ class _SingInState extends State<SingIn> {
         ],
       ),
       body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[
+              Color.fromARGB(255, 9, 73, 36),
+              Color.fromARGB(0, 80, 239, 191),
+            ],
+            begin: Alignment.topCenter,
+          ),
+        ),
         padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Productos:',
-              style: Theme.of(context).textTheme.headline6,
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 20,
+                color: Color.fromARGB(255, 9, 73, 36),
+              ),
             ),
             SizedBox(height: 30),
             Expanded(
@@ -165,11 +147,19 @@ class ProductCard extends StatelessWidget {
         ),
         title: Text(
           product.title,
-          style: Theme.of(context).textTheme.subtitle1,
+          style: TextStyle(
+            fontFamily: 'FredokaOne',
+            fontSize: 16,
+            color: Color.fromARGB(255, 9, 73, 36),
+          ),
         ),
         subtitle: Text(
           '\$${product.price.toStringAsFixed(2)}',
-          style: Theme.of(context).textTheme.subtitle1,
+          style: TextStyle(
+            fontFamily: 'FredokaOne',
+            fontSize: 16,
+            color: Color.fromARGB(255, 9, 73, 36),
+          ),
         ),
         trailing: ElevatedButton(
           onPressed: () {
@@ -189,15 +179,36 @@ class CustomPopupMenuButton extends StatelessWidget {
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
         PopupMenuItem<String>(
           value: 'joyeria',
-          child: Text('Joyería'),
+          child: Text(
+            'Joyería',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
         ),
         PopupMenuItem<String>(
           value: 'tecnologia',
-          child: Text('Tecnología'),
+          child: Text(
+            'Tecnología',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
         ),
         PopupMenuItem<String>(
           value: 'ropa',
-          child: Text('Ropa'),
+          child: Text(
+            'Ropa',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
         ),
       ],
       child: Row(
@@ -206,7 +217,11 @@ class CustomPopupMenuButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               'Menú',
-              style: Theme.of(context).textTheme.headline6,
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 20,
+                color: Color.fromARGB(255, 9, 73, 36),
+              ),
             ),
           ),
           Icon(Icons.arrow_drop_down),
