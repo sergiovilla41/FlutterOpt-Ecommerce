@@ -1,42 +1,53 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:mi_app_optativa/src/Pages/joyeria.dart';
-import 'package:mi_app_optativa/src/Pages/ropa.dart';
+import 'package:flutter/material.dart'; // Importa el paquete de Flutter
+import 'package:http/http.dart'
+    as http; // Importa el paquete HTTP para realizar solicitudes HTTP
 import 'dart:convert';
 
-import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+import 'package:mi_app_optativa/src/Pages/joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/ropa.dart';
+import 'package:mi_app_optativa/src/Pages/tecnologia.dart'; // Importa la biblioteca de dart para trabajar con JSON
+
+void main() {
+  runApp(MaterialApp(
+    home: SingIn(
+      username: 'Usuario', // Nombre de usuario predeterminado
+      password: '', // Contraseña predeterminada
+    ),
+  ));
+}
 
 class SingIn extends StatefulWidget {
-  final String username;
+  final String username; // Nombre de usuario
 
   SingIn({Key? key, required this.username, required String password})
       : super(key: key);
 
   @override
-  _SingInState createState() => _SingInState();
+  _SingInState createState() =>
+      _SingInState(); // Crea el estado del widget SingIn
 }
 
 class _SingInState extends State<SingIn> {
-  List<Product> products = [];
+  List<Product> products = []; // Lista de productos
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchProducts(); // Llama a la función para cargar los productos al iniciar la aplicación
   }
 
-  // Función para obtener productos de una API
   Future<void> fetchProducts() async {
-    final response =
-        await http.get(Uri.parse('https://fakestoreapi.com/products'));
+    final response = await http.get(Uri.parse(
+        'https://fakestoreapi.com/products')); // Realiza una solicitud HTTP para obtener los productos
     if (response.statusCode == 200) {
       setState(() {
         products = (json.decode(response.body) as List)
             .map((data) => Product.fromJson(data))
-            .toList();
+            .toList(); // Actualiza el estado de la aplicación con los productos obtenidos
       });
     } else {
-      throw Exception('Failed to load products');
+      throw Exception(
+          'Failed to load products'); // Lanza una excepción si no se pueden cargar los productos
     }
   }
 
@@ -45,7 +56,7 @@ class _SingInState extends State<SingIn> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'User: ${widget.username}',
+          'User: ${widget.username}', // Muestra el nombre de usuario en el AppBar
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
@@ -56,7 +67,7 @@ class _SingInState extends State<SingIn> {
         backgroundColor:
             Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
         actions: [
-          CustomPopupMenuButton(),
+          CustomPopupMenuButton(), // Muestra el menú desplegable
           IconButton(
             onPressed: () {
               // Acción al presionar el icono del carrito
@@ -97,7 +108,8 @@ class _SingInState extends State<SingIn> {
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  return ProductCard(product: product);
+                  return ProductCard(
+                      product: product); // Construye la tarjeta de producto
                 },
               ),
             ),
@@ -108,92 +120,144 @@ class _SingInState extends State<SingIn> {
   }
 }
 
-// Modelo de Producto
 class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String description;
-  final String category;
-  final String image;
+  final int id; // ID del producto
+  final String title; // Título del producto
+  final double price; // Precio del producto
+  final String image; // URL de la imagen del producto
+  int quantity; // Cantidad de productos
 
   Product({
     required this.id,
     required this.title,
     required this.price,
-    required this.description,
-    required this.category,
     required this.image,
+    this.quantity = 0, // Inicializa la cantidad de productos en 0
   });
 
-  // Constructor de Product desde JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
       title: json['title'],
       price: json['price'].toDouble(),
-      description: json['description'],
-      category: json['category'],
       image: json['image'],
     );
   }
 }
 
-// Widget para mostrar un producto
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
 
   const ProductCard({Key? key, required this.product}) : super(key: key);
 
   @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
-      child: ListTile(
-        leading: Image.network(
-          product.image,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-        ),
-        title: Text(
-          product.title,
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 16,
-            color: Color.fromARGB(255, 9, 73, 36),
-          ),
-        ),
-        subtitle: Text(
-          '\$${product.price.toStringAsFixed(2)}',
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 16,
-            color: Color.fromARGB(255, 9, 73, 36),
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Acción para agregar al carrito
-          },
-          child: Text(
-            'Comprar',
-            style: TextStyle(
-              color: Color.fromARGB(
-                  255, 232, 235, 232), // Color del texto del botón
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.network(
+                widget.product.image,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          style: ElevatedButton.styleFrom(
-            primary: Color.fromARGB(255, 9, 73, 36), // Color de fondo del botón
+          Expanded(
+            flex: 7,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.product.title,
+                    style: TextStyle(
+                      fontFamily: 'FredokaOne',
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 9, 73, 36),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '\$${widget.product.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontFamily: 'FredokaOne',
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 9, 73, 36),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (widget.product.quantity > 0) {
+                              widget.product
+                                  .quantity--; // Disminuye la cantidad de productos
+                            }
+                          });
+                        },
+                        icon: Icon(Icons
+                            .remove), // Icono para disminuir la cantidad de productos
+                      ),
+                      Text(
+                        widget.product.quantity
+                            .toString(), // Muestra la cantidad de productos
+                        style: TextStyle(
+                          fontFamily: 'FredokaOne',
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 9, 73, 36),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            widget.product
+                                .quantity++; // Aumenta la cantidad de productos
+                          });
+                        },
+                        icon: Icon(Icons
+                            .add), // Icono para aumentar la cantidad de productos
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Agregar lógica para agregar al carrito
+                    },
+                    child: Text('Agregar'), // Texto del botón de agregar
+                    style: ElevatedButton.styleFrom(
+                      primary:
+                          Color.fromARGB(255, 9, 73, 36), // Color del botón
+                      textStyle: TextStyle(
+                        fontFamily: 'FredokaOne',
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-// Widget para el menú desplegable personalizado
 class CustomPopupMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -275,16 +339,15 @@ class CustomPopupMenuButton extends StatelessWidget {
   }
 }
 
-// Páginas de categorías
 class JewelryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Joyería'),
+        title: Text('Joyería'), // Título de la página
       ),
       body: Center(
-        child: Text('Página de Joyería'),
+        child: Text('Página de Joyería'), // Contenido de la página
       ),
     );
   }
@@ -295,10 +358,10 @@ class TechnologyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tecnología'),
+        title: Text('Tecnología'), // Título de la página
       ),
       body: Center(
-        child: Text('Página de Tecnología'),
+        child: Text('Página de Tecnología'), // Contenido de la página
       ),
     );
   }
@@ -309,21 +372,11 @@ class ClothingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ropa'),
+        title: Text('Ropa'), // Título de la página
       ),
       body: Center(
-        child: Text('Página de Ropa'),
+        child: Text('Página de Ropa'), // Contenido de la página
       ),
     );
   }
-}
-
-void main() {
-  // Inicializa la aplicación con la página de inicio de sesión
-  runApp(MaterialApp(
-    home: SingIn(
-      username: 'Usuario',
-      password: '',
-    ),
-  ));
 }

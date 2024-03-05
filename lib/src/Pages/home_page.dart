@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 // Widget personalizado que muestra un icono
                 IconContainer(
-                  url: '../images/oso.png',
+                  url: 'images/oso.png',
                 ),
                 // Texto de bienvenida
                 Text(

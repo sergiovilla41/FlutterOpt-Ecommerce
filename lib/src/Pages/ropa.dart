@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// Página de la categoría "ropa"
+import 'package:mi_app_optativa/src/Pages/joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+
 class ropa extends StatefulWidget {
   ropa({Key? key}) : super(key: key);
 
@@ -16,10 +18,9 @@ class _ropaState extends State<ropa> {
   @override
   void initState() {
     super.initState();
-    fetchProducts(); // Llama a la función para obtener productos al inicializar
+    fetchProducts();
   }
 
-  // Función para obtener productos de la categoría "ropa" desde una API
   Future<void> fetchProducts() async {
     final response = await http.get(Uri.parse(
         'https://fakestoreapi.com/products/category/men\'s clothing'));
@@ -39,23 +40,21 @@ class _ropaState extends State<ropa> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' Ropa', // Título de la página de ropa
+          ' Ropa',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 20,
-            color: Colors.white, // Color del texto del AppBar
+            color: Colors.white,
           ),
         ),
-        backgroundColor:
-            Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+        backgroundColor: Color.fromARGB(207, 14, 73, 9),
         actions: [
+          CustomPopupMenuButton(), // Muestra el menú desplegable
           IconButton(
-            onPressed: () {
-              // Acción al presionar el icono del carrito
-            },
+            onPressed: () {},
             icon: Icon(
-              Icons.shopping_cart, // Icono del carrito de compras
-              color: Colors.white, // Color del icono
+              Icons.shopping_cart,
+              color: Colors.white,
             ),
           ),
         ],
@@ -75,7 +74,7 @@ class _ropaState extends State<ropa> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Store:', // Encabezado de la tienda
+              'Store:',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
@@ -99,7 +98,6 @@ class _ropaState extends State<ropa> {
   }
 }
 
-// Modelo de Producto
 class Product {
   final int id;
   final String title;
@@ -117,7 +115,6 @@ class Product {
     required this.image,
   });
 
-  // Constructor de Product desde JSON
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
@@ -130,61 +127,177 @@ class Product {
   }
 }
 
-// Widget para mostrar un producto
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
 
   const ProductCard({Key? key, required this.product}) : super(key: key);
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  int quantity = 0;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
-      child: ListTile(
-        leading: Image.network(
-          product.image,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-        ),
-        title: Text(
-          product.title,
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 16,
-            color: Color.fromARGB(255, 9, 73, 36),
-          ),
-        ),
-        subtitle: Text(
-          '\$${product.price.toStringAsFixed(2)}',
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 16,
-            color: Color.fromARGB(255, 9, 73, 36),
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Acción para agregar al carrito
-          },
-          child: Text(
-            'Comprar',
-            style: TextStyle(
-              color: Color.fromARGB(
-                  255, 232, 235, 232), // Color del texto del botón
+      child: Column(
+        children: [
+          ListTile(
+            leading: Image.network(
+              widget.product.image,
+              width: 60, // Ajusta el tamaño de la imagen
+              height: 60, // Ajusta el tamaño de la imagen
+              fit: BoxFit.cover,
+            ),
+            title: Text(
+              widget.product.title,
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 14, // Ajusta el tamaño del texto
+                color: Color.fromARGB(255, 9, 73, 36),
+              ),
+            ),
+            subtitle: Text(
+              '\$${widget.product.price.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 14, // Ajusta el tamaño del texto
+                color: Color.fromARGB(255, 9, 73, 36),
+              ),
             ),
           ),
-          style: ElevatedButton.styleFrom(
-            primary: Color.fromARGB(255, 9, 73, 36), // Color de fondo del botón
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Centra los botones
+            children: [
+              IconButton(
+                onPressed: () {
+                  // Acción para restar la cantidad
+                },
+                icon: Icon(Icons.remove),
+              ),
+              Text(
+                '0',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 14, // Ajusta el tamaño del texto
+                  color: Color.fromARGB(255, 9, 73, 36),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  // Acción para sumar la cantidad
+                },
+                icon: Icon(Icons.add),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Acción para agregar al carrito
+                },
+                child: Text(
+                  'Agregar',
+                  style: TextStyle(
+                    fontFamily: 'FredokaOne',
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 9, 73, 36),
+                ),
+              ),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }
 }
 
-// Función principal para iniciar la aplicación con la página de ropa
+class CustomPopupMenuButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (String value) {
+        switch (value) {
+          case 'joyeria':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => joyeria()),
+            );
+            break;
+          case 'tecnologia':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => tecnologia()),
+            );
+            break;
+          case 'ropa':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ropa()),
+            );
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'joyeria',
+          child: Text(
+            'Joyería',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'tecnologia',
+          child: Text(
+            'Tecnología',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'ropa',
+          child: Text(
+            'Ropa',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: Color.fromARGB(255, 9, 73, 36),
+            ),
+          ),
+        ),
+      ],
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Menú',
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 20,
+                color: Color.fromARGB(255, 232, 235, 232),
+              ),
+            ),
+          ),
+          Icon(Icons.arrow_drop_down),
+        ],
+      ),
+    );
+  }
+}
+
 void main() {
   runApp(MaterialApp(
     home: ropa(),
