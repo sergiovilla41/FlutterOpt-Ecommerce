@@ -2,12 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:mi_app_optativa/src/Pages/joyeria.dart';
-import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+void main() {
+  runApp(MaterialApp(
+    home: ropa(),
+  ));
+}
+
+class Product {
+  final int id;
+  final String title;
+  final double price;
+  final String description;
+  final String category;
+  final String image;
+  int quantity;
+
+  Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.description,
+    required this.category,
+    required this.image,
+    this.quantity = 0,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      title: json['title'],
+      price: json['price'].toDouble(),
+      description: json['description'],
+      category: json['category'],
+      image: json['image'],
+    );
+  }
+}
 
 class ropa extends StatefulWidget {
-  ropa({Key? key}) : super(key: key);
-
   @override
   _ropaState createState() => _ropaState();
 }
@@ -24,7 +56,7 @@ class _ropaState extends State<ropa> {
 
   Future<void> fetchProducts() async {
     final response = await http.get(Uri.parse(
-        'https://fakestoreapi.com/products/category/men\'s clothing'));
+        'https://fakestoreapi.com/products/category/men%27s%20clothing'));
     if (response.statusCode == 200) {
       setState(() {
         products = (json.decode(response.body) as List)
@@ -38,7 +70,7 @@ class _ropaState extends State<ropa> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -53,16 +85,20 @@ class _ropaState extends State<ropa> {
             ? const Color.fromARGB(255, 61, 60, 60)
             : Color.fromARGB(207, 14, 73, 9),
         actions: [
-          CustomPopupMenuButton(
-              isDarkMode: isDarkMode), // Muestra el menú desplegable
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.shopping_cart,
-              color: Colors.white,
-            ),
-          ),
+          CustomPopupMenuButton(isDarkMode: isDarkMode),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ShoppingCartPage(products: products)),
+          );
+        },
+        child: Icon(Icons.shopping_cart),
+        backgroundColor: const Color.fromARGB(255, 58, 100, 59),
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -92,7 +128,7 @@ class _ropaState extends State<ropa> {
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  return ProductCard(product: product);
+                  return ProductCard(product: product, isDarkMode: isDarkMode);
                 },
               ),
             ),
@@ -103,39 +139,12 @@ class _ropaState extends State<ropa> {
   }
 }
 
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String description;
-  final String category;
-  final String image;
-
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.description,
-    required this.category,
-    required this.image,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      description: json['description'],
-      category: json['category'],
-      image: json['image'],
-    );
-  }
-}
-
 class ProductCard extends StatefulWidget {
   final Product product;
+  final bool isDarkMode;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({Key? key, required this.product, required this.isDarkMode})
+      : super(key: key);
 
   @override
   _ProductCardState createState() => _ProductCardState();
@@ -146,17 +155,15 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(8.0), // Padding alrededor de la imagen
+            padding: EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 130, // Altura de la imagen
+              height: 130,
               child: Image.network(
                 widget.product.image,
                 fit: BoxFit.cover,
@@ -169,8 +176,7 @@ class _ProductCardState extends State<ProductCard> {
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 16,
-                color:
-                    isDarkMode ? Colors.white : Color.fromARGB(255, 9, 73, 36),
+                color: widget.isDarkMode ? Colors.white : Colors.black,
               ),
             ),
             subtitle: Text(
@@ -178,8 +184,7 @@ class _ProductCardState extends State<ProductCard> {
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 16,
-                color:
-                    isDarkMode ? Colors.white : Color.fromARGB(255, 9, 73, 36),
+                color: widget.isDarkMode ? Colors.white : Colors.black,
               ),
             ),
           ),
@@ -201,9 +206,7 @@ class _ProductCardState extends State<ProductCard> {
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
                   fontSize: 16,
-                  color: isDarkMode
-                      ? Colors.white
-                      : Color.fromARGB(255, 9, 73, 36),
+                  color: widget.isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
               IconButton(
@@ -216,20 +219,20 @@ class _ProductCardState extends State<ProductCard> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Acción para agregar al carrito con la cantidad seleccionada
+                  addToCart(widget.product, quantity);
                 },
                 child: Text(
                   'Agregar',
                   style: TextStyle(
                     fontFamily: 'FredokaOne',
                     fontSize: 16,
-                    color: isDarkMode
+                    color: widget.isDarkMode
                         ? Color.fromARGB(255, 255, 255, 254)
                         : Color.fromARGB(255, 44, 44, 44),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  primary: isDarkMode
+                  primary: widget.isDarkMode
                       ? const Color.fromARGB(255, 53, 87, 54)
                       : Color.fromARGB(255, 99, 151, 102),
                 ),
@@ -239,6 +242,14 @@ class _ProductCardState extends State<ProductCard> {
         ],
       ),
     );
+  }
+
+  void addToCart(Product product, int quantity) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Agregado al carrito: ${product.title} x $quantity'),
+      duration: Duration(seconds: 2),
+    ));
   }
 }
 
@@ -255,13 +266,13 @@ class CustomPopupMenuButton extends StatelessWidget {
           case 'joyeria':
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => joyeria()),
+              MaterialPageRoute(builder: (context) => JewelryPage()),
             );
             break;
           case 'tecnologia':
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => tecnologia()),
+              MaterialPageRoute(builder: (context) => TechnologyPage()),
             );
             break;
           case 'ropa':
@@ -327,8 +338,79 @@ class CustomPopupMenuButton extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: ropa(),
-  ));
+class ShoppingCartPage extends StatelessWidget {
+  final List<Product> products;
+
+  const ShoppingCartPage({Key? key, required this.products}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double total = 0;
+
+    // Calcular el total del carrito
+    for (var product in products) {
+      total += product.price * product.quantity;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Carrito de compras'),
+      ),
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return ListTile(
+            title: Text(product.title),
+            subtitle: Text('Cantidad: ${product.quantity}'),
+            trailing: Text(
+                '\$${(product.price * product.quantity).toStringAsFixed(2)}'),
+            onTap: () {
+              // Acción al hacer clic en un producto (opcional)
+            },
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Total: \$${total.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class JewelryPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Joyería'), // Título de la página
+      ),
+      body: Center(
+        child: Text('Página de Joyería'), // Contenido de la página
+      ),
+    );
+  }
+}
+
+class TechnologyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tecnología'), // Título de la página
+      ),
+      body: Center(
+        child: Text('Página de Tecnología'), // Contenido de la página
+      ),
+    );
+  }
 }

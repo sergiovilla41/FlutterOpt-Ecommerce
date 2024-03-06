@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // Acción al presionar el botón de inicio de sesión
                       final route = MaterialPageRoute(
-                        builder: (context) => SingIn(
+                        builder: (context) => SignIn(
                             username: _usernameController.text,
                             password: _passwordController.text),
                       );

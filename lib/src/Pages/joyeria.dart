@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'dart:convert';
 
-import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
 
 void main() {
@@ -11,9 +11,35 @@ void main() {
   ));
 }
 
-class joyeria extends StatefulWidget {
-  joyeria({Key? key}) : super(key: key);
+class Product {
+  final int id;
+  final String title;
+  final double price;
+  final String category;
+  final String image;
+  int quantity;
 
+  Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.category,
+    required this.image,
+    this.quantity = 0,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      title: json['title'],
+      price: json['price'].toDouble(),
+      category: json['category'],
+      image: json['image'],
+    );
+  }
+}
+
+class joyeria extends StatefulWidget {
   @override
   _joyeriaState createState() => _joyeriaState();
 }
@@ -59,15 +85,7 @@ class _joyeriaState extends State<joyeria> {
             ? const Color.fromARGB(255, 61, 60, 60)
             : Color.fromARGB(207, 14, 73, 9), //
         actions: [
-          CustomPopupMenuButton(
-              isDarkMode: isDarkMode), // Muestra el menú desplegable
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.shopping_cart,
-              color: Colors.white,
-            ),
-          ),
+          CustomPopupMenuButton(isDarkMode: isDarkMode),
         ],
       ),
       body: Container(
@@ -109,32 +127,6 @@ class _joyeriaState extends State<joyeria> {
   }
 }
 
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String category;
-  final String image;
-
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.category,
-    required this.image,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      category: json['category'],
-      image: json['image'],
-    );
-  }
-}
-
 class ProductCard extends StatefulWidget {
   final Product product;
   final bool isDarkMode;
@@ -157,9 +149,9 @@ class _ProductCardState extends State<ProductCard> {
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(8.0), // Padding alrededor de la imagen
+            padding: EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 130, // Altura de la imagen
+              height: 130,
               child: Image.network(
                 widget.product.image,
                 fit: BoxFit.cover,
@@ -215,7 +207,7 @@ class _ProductCardState extends State<ProductCard> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Acción para agregar al carrito con la cantidad seleccionada
+                  addToCart(widget.product, quantity, context);
                 },
                 child: Text(
                   'Agregar',
@@ -238,6 +230,14 @@ class _ProductCardState extends State<ProductCard> {
         ],
       ),
     );
+  }
+
+  void addToCart(Product product, int quantity, BuildContext context) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Agregado al carrito: ${product.title} x $quantity'),
+      duration: Duration(seconds: 2),
+    ));
   }
 }
 
@@ -283,28 +283,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             ),
           ),
         ),
-        PopupMenuItem<String>(
-          value: 'tecnologia',
-          child: Text(
-            'Tecnología',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'ropa',
-          child: Text(
-            'Ropa',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
+        // Añadir más elementos de menú para otras categorías si es necesario
       ],
       child: Row(
         children: [
@@ -321,48 +300,6 @@ class CustomPopupMenuButton extends StatelessWidget {
           ),
           Icon(Icons.arrow_drop_down),
         ],
-      ),
-    );
-  }
-}
-
-class JewelryPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Joyería'), // Título de la página
-      ),
-      body: Center(
-        child: Text('Página de Joyería'), // Contenido de la página
-      ),
-    );
-  }
-}
-
-class TechnologyPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tecnología'), // Título de la página
-      ),
-      body: Center(
-        child: Text('Página de Tecnología'), // Contenido de la página
-      ),
-    );
-  }
-}
-
-class ClothingPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Ropa'), // Título de la página
-      ),
-      body: Center(
-        child: Text('Página de Ropa'), // Contenido de la página
       ),
     );
   }

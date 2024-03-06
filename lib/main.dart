@@ -38,7 +38,7 @@ class LoginApp extends StatelessWidget {
         // Ruta para la página de inicio
         'Home': (BuildContext context) => HomePage(),
         // Ruta para la página de inicio de sesión
-        'SingIn': (BuildContext context) => SingIn(
+        'SingIn': (BuildContext context) => SignIn(
               username: '',
               password: '',
             ),

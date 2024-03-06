@@ -5,8 +5,42 @@ import 'dart:convert';
 import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/ropa.dart';
 
+void main() {
+  runApp(MaterialApp(
+    home: tecnologia(),
+  ));
+}
+
+class Product {
+  final int id;
+  final String title;
+  final double price;
+  final String category;
+  final String image;
+  int quantity;
+
+  Product({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.category,
+    required this.image,
+    this.quantity = 0,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      title: json['title'],
+      price: json['price'].toDouble(),
+      category: json['category'],
+      image: json['image'],
+    );
+  }
+}
+
 class tecnologia extends StatefulWidget {
-  tecnologia({Key? key}) : super(key: key);
+  const tecnologia({super.key});
 
   @override
   _tecnologiaState createState() => _tecnologiaState();
@@ -54,16 +88,21 @@ class _tecnologiaState extends State<tecnologia> {
         actions: [
           CustomPopupMenuButton(
               isDarkMode: isDarkMode), // Muestra el menú desplegable
-          IconButton(
-            onPressed: () {
-              // Acción al presionar el icono del carrito
-            },
-            icon: Icon(
-              Icons.shopping_cart, // Icono del carrito de compras
-              color: Colors.white, // Color del icono
-            ),
-          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ShoppingCartPage(products: products)),
+          );
+        },
+        child: Icon(Icons.shopping_cart),
+        backgroundColor: const Color.fromARGB(255, 58, 100, 59),
+        foregroundColor: isDarkMode
+            ? Colors.white
+            : Colors.black, // Color de fondo del botón
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -100,32 +139,6 @@ class _tecnologiaState extends State<tecnologia> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String category;
-  final String image;
-
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.category,
-    required this.image,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      category: json['category'],
-      image: json['image'],
     );
   }
 }
@@ -214,7 +227,7 @@ class _ProductCardState extends State<ProductCard> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Acción para agregar al carrito
+                  addToCart(widget.product, quantity);
                 },
                 child: Text(
                   'Agregar',
@@ -237,6 +250,14 @@ class _ProductCardState extends State<ProductCard> {
         ],
       ),
     );
+  }
+
+  void addToCart(Product product, int quantity) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Agregado al carrito: ${product.title} x $quantity'),
+      duration: Duration(seconds: 1),
+    ));
   }
 }
 
@@ -325,6 +346,55 @@ class CustomPopupMenuButton extends StatelessWidget {
   }
 }
 
+class ShoppingCartPage extends StatelessWidget {
+  final List<Product> products;
+
+  const ShoppingCartPage({Key? key, required this.products}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double total = 0;
+
+    // Calcular el total del carrito
+    for (var product in products) {
+      total += product.price * product.quantity;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Carrito de compras'),
+      ),
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return ListTile(
+            title: Text(product.title),
+            subtitle: Text('Cantidad: ${product.quantity}'),
+            trailing: Text(
+                '\$${(product.price * product.quantity).toStringAsFixed(2)}'),
+            onTap: () {
+              // Acción al hacer clic en un producto (opcional)
+            },
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Total: \$${total.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class JewelryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -334,20 +404,6 @@ class JewelryPage extends StatelessWidget {
       ),
       body: Center(
         child: Text('Página de Joyería'), // Contenido de la página
-      ),
-    );
-  }
-}
-
-class TechnologyPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tecnología'), // Título de la página
-      ),
-      body: Center(
-        child: Text('Página de Tecnología'), // Contenido de la página
       ),
     );
   }
@@ -365,10 +421,4 @@ class ClothingPage extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: tecnologia(),
-  ));
 }

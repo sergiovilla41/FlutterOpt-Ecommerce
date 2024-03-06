@@ -2,104 +2,143 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:mi_app_optativa/src/Pages/Cart.dart' as CartPage;
 import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: SingIn(
-      username: 'Usuario', // Nombre de usuario predeterminado
-      password: '', // Contraseña predeterminada
+    home: SignIn(
+      username: 'Usuario',
+      password: '',
     ),
   ));
 }
 
-class SingIn extends StatefulWidget {
-  final String username; // Nombre de usuario
+class SignIn extends StatefulWidget {
+  final String username;
 
-  SingIn({Key? key, required this.username, required String password})
+  SignIn({Key? key, required this.username, required String password})
       : super(key: key);
 
   @override
-  _SingInState createState() =>
-      _SingInState(); // Crea el estado del widget SingIn
+  _SignInState createState() => _SignInState();
 }
 
-class _SingInState extends State<SingIn> {
-  List<Product> products = []; // Lista de productos
-  bool isDarkMode = false; // Variable para controlar el modo oscuro
+class _SignInState extends State<SignIn> {
+  List<Product> products = [];
+  bool isDarkMode = false;
+  int totalProducts = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchProducts(); // Llama a la función para cargar los productos al iniciar la aplicación
+    fetchProducts();
+  }
+
+  int _calculateTotalProducts() {
+    int total = 0;
+    for (var product in products) {
+      total += product.quantity;
+    }
+    return total;
   }
 
   Future<void> fetchProducts() async {
-    final response = await http.get(Uri.parse(
-        'https://fakestoreapi.com/products')); // Realiza una solicitud HTTP para obtener los productos
+    final response =
+        await http.get(Uri.parse('https://fakestoreapi.com/products'));
     if (response.statusCode == 200) {
       setState(() {
         products = (json.decode(response.body) as List)
             .map((data) => Product.fromJson(data))
-            .toList(); // Actualiza el estado de la aplicación con los productos obtenidos
+            .toList();
+        for (var product in products) {
+          product.quantity = 0;
+        }
       });
     } else {
-      throw Exception(
-          'Failed to load products'); // Lanza una excepción si no se pueden cargar los productos
+      throw Exception('Failed to load products');
     }
+  }
+
+  void updateTotalProducts() {
+    setState(() {
+      totalProducts = _calculateTotalProducts();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: isDarkMode
-          ? ThemeData.dark()
-          : ThemeData
-              .light(), // Define el tema de la aplicación según el modo seleccionado
+      theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
           title: Text(
-            'User: ${widget.username}', // Muestra el nombre de usuario en el AppBar
+            'User: ${widget.username}',
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: isDarkMode
-                  ? Colors.white
-                  : Colors.black, // Color del texto del AppBar
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
           backgroundColor: isDarkMode
               ? const Color.fromARGB(255, 61, 60, 60)
-              : Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+              : Color.fromARGB(207, 14, 73, 9),
           actions: [
-            CustomPopupMenuButton(
-                isDarkMode: isDarkMode), // Muestra el menú desplegable
-            IconButton(
-              onPressed: () {
-                // Acción al presionar el icono del carrito
-              },
-              icon: Icon(
-                Icons.shopping_cart, // Icono del carrito de compras
-                color:
-                    isDarkMode ? Colors.white : Colors.black, // Color del icono
-              ),
-            ),
-            SizedBox(width: 8), // Espacio adicional entre los iconos
+            CustomPopupMenuButton(isDarkMode: isDarkMode),
+            SizedBox(width: 8),
             IconButton(
               onPressed: () {
                 setState(() {
-                  isDarkMode = !isDarkMode; // Cambia el estado del modo oscuro
+                  isDarkMode = !isDarkMode;
                 });
               },
               icon: Icon(
-                isDarkMode
-                    ? Icons.dark_mode
-                    : Icons.light_mode, // Icono según el modo seleccionado
+                isDarkMode ? Icons.dark_mode : Icons.light_mode,
                 color: isDarkMode
                     ? Color.fromARGB(255, 236, 234, 234)
-                    : Color.fromARGB(255, 175, 167, 54), // Color del icono
+                    : Color.fromARGB(255, 175, 167, 54),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: Stack(
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartPage.ShoppingCartPage(
+                        products: products, isDarkMode: isDarkMode),
+                  ),
+                );
+              },
+              child: Icon(Icons.shopping_cart),
+              backgroundColor: const Color.fromARGB(255, 58, 100, 59),
+              foregroundColor: isDarkMode ? Colors.white : Colors.black,
+            ),
+            Positioned(
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 16,
+                  minHeight: 16,
+                ),
+                child: Text(
+                  totalProducts.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                ),
               ),
             ),
           ],
@@ -109,11 +148,11 @@ class _SingInState extends State<SingIn> {
             gradient: LinearGradient(
               colors: isDarkMode
                   ? [
-                      Color.fromARGB(255, 9, 73, 36),
+                      Color.fromARGB(255, 36, 70, 36),
                       Color.fromARGB(179, 22, 24, 23),
                     ]
                   : [
-                      Color.fromARGB(255, 230, 255, 230),
+                      Color.fromARGB(255, 123, 153, 114),
                       Color.fromARGB(0, 191, 255, 191),
                     ],
               begin: Alignment.topCenter,
@@ -124,7 +163,7 @@ class _SingInState extends State<SingIn> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Store', // Agregar "Store" encima de las tarjetas
+                'Store',
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
                   fontSize: 30,
@@ -141,9 +180,10 @@ class _SingInState extends State<SingIn> {
                   itemBuilder: (BuildContext context, int index) {
                     final product = products[index];
                     return ProductCard(
-                        product: product,
-                        isDarkMode:
-                            isDarkMode); // Construye la tarjeta de producto
+                      product: product,
+                      isDarkMode: isDarkMode,
+                      updateTotalProducts: updateTotalProducts,
+                    );
                   },
                 ),
               ),
@@ -156,18 +196,18 @@ class _SingInState extends State<SingIn> {
 }
 
 class Product {
-  final int id; // ID del producto
-  final String title; // Título del producto
-  final double price; // Precio del producto
-  final String image; // URL de la imagen del producto
-  int quantity; // Cantidad de productos
+  final int id;
+  final String title;
+  final double price;
+  final String image;
+  int quantity;
 
   Product({
     required this.id,
     required this.title,
     required this.price,
     required this.image,
-    this.quantity = 0, // Inicializa la cantidad de productos en 0
+    this.quantity = 0,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -183,8 +223,13 @@ class Product {
 class ProductCard extends StatefulWidget {
   final Product product;
   final bool isDarkMode;
+  final VoidCallback updateTotalProducts;
 
-  const ProductCard({Key? key, required this.product, required this.isDarkMode})
+  const ProductCard(
+      {Key? key,
+      required this.product,
+      required this.isDarkMode,
+      required this.updateTotalProducts})
       : super(key: key);
 
   @override
@@ -243,6 +288,7 @@ class _ProductCardState extends State<ProductCard> {
                           setState(() {
                             if (widget.product.quantity > 0) {
                               widget.product.quantity--;
+                              widget.updateTotalProducts();
                             }
                           });
                         },
@@ -262,6 +308,7 @@ class _ProductCardState extends State<ProductCard> {
                         onPressed: () {
                           setState(() {
                             widget.product.quantity++;
+                            widget.updateTotalProducts();
                           });
                         },
                         icon: Icon(Icons.add),
@@ -272,10 +319,12 @@ class _ProductCardState extends State<ProductCard> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        _isButtonPressed =
-                            !_isButtonPressed; // Cambia el estado del botón
+                        if (!_isButtonPressed) {
+                          widget.product.quantity++;
+                          widget.updateTotalProducts();
+                        }
+                        _isButtonPressed = !_isButtonPressed;
                       });
-                      // Agregar lógica para agregar al carrito
                     },
                     child: Text(
                       'Agregar +',
@@ -286,8 +335,7 @@ class _ProductCardState extends State<ProductCard> {
                             ? Color.fromARGB(255, 0, 0, 0)
                             : widget.isDarkMode
                                 ? Color.fromARGB(255, 255, 255, 254)
-                                : Color.fromARGB(255, 44, 44,
-                                    44), // Color del texto siempre blanco
+                                : Color.fromARGB(255, 44, 44, 44),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -400,10 +448,10 @@ class JewelryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Joyería'), // Título de la página
+        title: Text('Joyería'),
       ),
       body: Center(
-        child: Text('Página de Joyería'), // Contenido de la página
+        child: Text('Página de Joyería'),
       ),
     );
   }
@@ -414,10 +462,10 @@ class TechnologyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tecnología'), // Título de la página
+        title: Text('Tecnología'),
       ),
       body: Center(
-        child: Text('Página de Tecnología'), // Contenido de la página
+        child: Text('Página de Tecnología'),
       ),
     );
   }
@@ -428,10 +476,10 @@ class ClothingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ropa'), // Título de la página
+        title: Text('Ropa'),
       ),
       body: Center(
-        child: Text('Página de Ropa'), // Contenido de la página
+        child: Text('Página de Ropa'),
       ),
     );
   }
