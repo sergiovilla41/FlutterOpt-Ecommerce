@@ -30,19 +30,12 @@ class _SignInState extends State<SignIn> {
   List<Product> products = [];
   bool isDarkMode = false;
   int totalProducts = 0;
+  Set<int> uniqueProductIds = {};
 
   @override
   void initState() {
     super.initState();
     fetchProducts();
-  }
-
-  int _calculateTotalProducts() {
-    int total = 0;
-    for (var product in products) {
-      total += product.quantity;
-    }
-    return total;
   }
 
   Future<void> fetchProducts() async {
@@ -53,13 +46,21 @@ class _SignInState extends State<SignIn> {
         products = (json.decode(response.body) as List)
             .map((data) => Product.fromJson(data))
             .toList();
-        for (var product in products) {
-          product.quantity = 0;
-        }
       });
     } else {
       throw Exception('Failed to load products');
     }
+  }
+
+  void updateUniqueProductIds() {
+    setState(() {
+      uniqueProductIds.clear();
+      for (var product in products) {
+        if (product.quantity > 0) {
+          uniqueProductIds.add(product.id);
+        }
+      }
+    });
   }
 
   void updateTotalProducts() {
@@ -68,8 +69,17 @@ class _SignInState extends State<SignIn> {
     });
   }
 
+  int _calculateTotalProducts() {
+    int total = 0;
+    for (var product in products) {
+      total += product.quantity;
+    }
+    return total;
+  }
+
   @override
   Widget build(BuildContext context) {
+    int totalUniqueProducts = uniqueProductIds.length;
     return MaterialApp(
       theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
@@ -111,7 +121,9 @@ class _SignInState extends State<SignIn> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => CartPage.ShoppingCartPage(
-                        products: products, isDarkMode: isDarkMode),
+                      products: products,
+                      isDarkMode: isDarkMode,
+                    ),
                   ),
                 );
               },
@@ -132,7 +144,7 @@ class _SignInState extends State<SignIn> {
                   minHeight: 16,
                 ),
                 child: Text(
-                  totalProducts.toString(),
+                  totalUniqueProducts.toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -183,6 +195,7 @@ class _SignInState extends State<SignIn> {
                       product: product,
                       isDarkMode: isDarkMode,
                       updateTotalProducts: updateTotalProducts,
+                      updateUniqueProductIds: updateUniqueProductIds,
                     );
                   },
                 ),
@@ -224,21 +237,21 @@ class ProductCard extends StatefulWidget {
   final Product product;
   final bool isDarkMode;
   final VoidCallback updateTotalProducts;
+  final VoidCallback updateUniqueProductIds;
 
-  const ProductCard(
-      {Key? key,
-      required this.product,
-      required this.isDarkMode,
-      required this.updateTotalProducts})
-      : super(key: key);
+  const ProductCard({
+    Key? key,
+    required this.product,
+    required this.isDarkMode,
+    required this.updateTotalProducts,
+    required this.updateUniqueProductIds,
+  }) : super(key: key);
 
   @override
   _ProductCardState createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool _isButtonPressed = false;
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -289,6 +302,7 @@ class _ProductCardState extends State<ProductCard> {
                             if (widget.product.quantity > 0) {
                               widget.product.quantity--;
                               widget.updateTotalProducts();
+                              widget.updateUniqueProductIds();
                             }
                           });
                         },
@@ -309,6 +323,7 @@ class _ProductCardState extends State<ProductCard> {
                           setState(() {
                             widget.product.quantity++;
                             widget.updateTotalProducts();
+                            widget.updateUniqueProductIds();
                           });
                         },
                         icon: Icon(Icons.add),
@@ -318,32 +333,24 @@ class _ProductCardState extends State<ProductCard> {
                   SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        if (!_isButtonPressed) {
-                          widget.product.quantity++;
-                          widget.updateTotalProducts();
-                        }
-                        _isButtonPressed = !_isButtonPressed;
-                      });
+                      widget.product.quantity = widget.product.quantity == 0
+                          ? 1
+                          : widget.product.quantity;
+                      widget.updateTotalProducts();
+                      widget.updateUniqueProductIds();
                     },
                     child: Text(
                       'Agregar +',
                       style: TextStyle(
                         fontFamily: 'FredokaOne',
                         fontSize: 16,
-                        color: _isButtonPressed
-                            ? Color.fromARGB(255, 0, 0, 0)
-                            : widget.isDarkMode
-                                ? Color.fromARGB(255, 255, 255, 254)
-                                : Color.fromARGB(255, 44, 44, 44),
+                        color: widget.isDarkMode ? Colors.black : Colors.white,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      primary: _isButtonPressed
-                          ? Color.fromARGB(255, 44, 116, 47).withOpacity(0.8)
-                          : widget.isDarkMode
-                              ? const Color.fromARGB(255, 53, 87, 54)
-                              : Color.fromARGB(255, 99, 151, 102),
+                      primary: widget.isDarkMode
+                          ? Color.fromARGB(255, 53, 87, 54)
+                          : Color.fromARGB(255, 99, 151, 102),
                     ),
                   ),
                 ],
