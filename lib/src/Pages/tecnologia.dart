@@ -130,10 +130,17 @@ class Product {
   }
 }
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
 
   const ProductCard({Key? key, required this.product}) : super(key: key);
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  int quantity = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -149,14 +156,14 @@ class ProductCard extends StatelessWidget {
             child: SizedBox(
               height: 130, // Altura fija de la tarjeta
               child: Image.network(
-                product.image,
+                widget.product.image,
                 fit: BoxFit.cover,
               ),
             ),
           ),
           ListTile(
             title: Text(
-              product.title,
+              widget.product.title,
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 14, // Ajusta el tamaño del texto
@@ -165,7 +172,7 @@ class ProductCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              '\$${product.price.toStringAsFixed(2)}',
+              '\$${widget.product.price.toStringAsFixed(2)}',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 14, // Ajusta el tamaño del texto
@@ -179,12 +186,16 @@ class ProductCard extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  // Acción para restar la cantidad
+                  setState(() {
+                    if (quantity > 0) {
+                      quantity--;
+                    }
+                  });
                 },
                 icon: Icon(Icons.remove),
               ),
               Text(
-                '0',
+                quantity.toString(), // Muestra la cantidad actual
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
                   fontSize: 14, // Ajusta el tamaño del texto
@@ -195,7 +206,9 @@ class ProductCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  // Acción para sumar la cantidad
+                  setState(() {
+                    quantity++;
+                  });
                 },
                 icon: Icon(Icons.add),
               ),
