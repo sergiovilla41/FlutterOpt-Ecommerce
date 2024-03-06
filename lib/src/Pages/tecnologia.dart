@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'dart:convert';
 
+import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/ropa.dart';
 
 class tecnologia extends StatefulWidget {
@@ -37,6 +37,7 @@ class _tecnologiaState extends State<tecnologia> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -47,10 +48,12 @@ class _tecnologiaState extends State<tecnologia> {
             color: Colors.white, // Color del texto del AppBar
           ),
         ),
-        backgroundColor:
-            Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+        backgroundColor: isDarkMode
+            ? const Color.fromARGB(255, 61, 60, 60)
+            : Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
         actions: [
-          CustomPopupMenuButton(), // Muestra el menú desplegable
+          CustomPopupMenuButton(
+              isDarkMode: isDarkMode), // Muestra el menú desplegable
           IconButton(
             onPressed: () {
               // Acción al presionar el icono del carrito
@@ -134,24 +137,31 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
       child: Column(
         children: [
-          ListTile(
-            leading: Image.network(
-              product.image,
-              width: 60, // Ajusta el tamaño de la imagen
-              height: 60, // Ajusta el tamaño de la imagen
-              fit: BoxFit.cover,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 130, // Altura fija de la tarjeta
+              child: Image.network(
+                product.image,
+                fit: BoxFit.cover,
+              ),
             ),
+          ),
+          ListTile(
             title: Text(
               product.title,
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 14, // Ajusta el tamaño del texto
-                color: Color.fromARGB(255, 9, 73, 36),
+                color:
+                    isDarkMode ? Colors.white : Color.fromARGB(255, 10, 10, 10),
               ),
             ),
             subtitle: Text(
@@ -159,7 +169,8 @@ class ProductCard extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 14, // Ajusta el tamaño del texto
-                color: Color.fromARGB(255, 9, 73, 36),
+                color:
+                    isDarkMode ? Colors.white : Color.fromARGB(255, 15, 15, 15),
               ),
             ),
           ),
@@ -177,7 +188,9 @@ class ProductCard extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
                   fontSize: 14, // Ajusta el tamaño del texto
-                  color: Color.fromARGB(255, 9, 73, 36),
+                  color: isDarkMode
+                      ? Colors.white
+                      : Color.fromARGB(255, 18, 19, 18),
                 ),
               ),
               IconButton(
@@ -195,11 +208,15 @@ class ProductCard extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'FredokaOne',
                     fontSize: 16,
-                    color: Colors.white,
+                    color: isDarkMode
+                        ? Color.fromARGB(255, 255, 255, 254)
+                        : Color.fromARGB(255, 44, 44, 44),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 9, 73, 36),
+                  primary: isDarkMode
+                      ? const Color.fromARGB(255, 53, 87, 54)
+                      : Color.fromARGB(255, 99, 151, 102),
                 ),
               ),
             ],
@@ -211,6 +228,10 @@ class ProductCard extends StatelessWidget {
 }
 
 class CustomPopupMenuButton extends StatelessWidget {
+  final bool isDarkMode;
+  const CustomPopupMenuButton({Key? key, required this.isDarkMode})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
@@ -244,7 +265,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -255,7 +276,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -266,7 +287,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -280,7 +301,7 @@ class CustomPopupMenuButton extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
-                color: Color.fromARGB(255, 232, 235, 232),
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
           ),

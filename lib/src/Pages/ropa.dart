@@ -14,6 +14,7 @@ class ropa extends StatefulWidget {
 
 class _ropaState extends State<ropa> {
   List<Product> products = [];
+  bool isDarkMode = false;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _ropaState extends State<ropa> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -47,9 +49,12 @@ class _ropaState extends State<ropa> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Color.fromARGB(207, 14, 73, 9),
+        backgroundColor: isDarkMode
+            ? const Color.fromARGB(255, 61, 60, 60)
+            : Color.fromARGB(207, 14, 73, 9),
         actions: [
-          CustomPopupMenuButton(), // Muestra el menú desplegable
+          CustomPopupMenuButton(
+              isDarkMode: isDarkMode), // Muestra el menú desplegable
           IconButton(
             onPressed: () {},
             icon: Icon(
@@ -141,72 +146,92 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
       child: Column(
         children: [
-          ListTile(
-            leading: Image.network(
-              widget.product.image,
-              width: 60, // Ajusta el tamaño de la imagen
-              height: 60, // Ajusta el tamaño de la imagen
-              fit: BoxFit.cover,
+          Container(
+            padding: EdgeInsets.all(8.0), // Padding alrededor de la imagen
+            child: SizedBox(
+              height: 130, // Altura de la imagen
+              child: Image.network(
+                widget.product.image,
+                fit: BoxFit.cover,
+              ),
             ),
+          ),
+          ListTile(
             title: Text(
               widget.product.title,
               style: TextStyle(
                 fontFamily: 'FredokaOne',
-                fontSize: 14, // Ajusta el tamaño del texto
-                color: Color.fromARGB(255, 9, 73, 36),
+                fontSize: 16,
+                color:
+                    isDarkMode ? Colors.white : Color.fromARGB(255, 9, 73, 36),
               ),
             ),
             subtitle: Text(
               '\$${widget.product.price.toStringAsFixed(2)}',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
-                fontSize: 14, // Ajusta el tamaño del texto
-                color: Color.fromARGB(255, 9, 73, 36),
+                fontSize: 16,
+                color:
+                    isDarkMode ? Colors.white : Color.fromARGB(255, 9, 73, 36),
               ),
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Centra los botones
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
                 onPressed: () {
-                  // Acción para restar la cantidad
+                  setState(() {
+                    if (quantity > 0) {
+                      quantity--;
+                    }
+                  });
                 },
                 icon: Icon(Icons.remove),
               ),
               Text(
-                '0',
+                quantity.toString(),
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
-                  fontSize: 14, // Ajusta el tamaño del texto
-                  color: Color.fromARGB(255, 9, 73, 36),
+                  fontSize: 16,
+                  color: isDarkMode
+                      ? Colors.white
+                      : Color.fromARGB(255, 9, 73, 36),
                 ),
               ),
               IconButton(
                 onPressed: () {
-                  // Acción para sumar la cantidad
+                  setState(() {
+                    quantity++;
+                  });
                 },
                 icon: Icon(Icons.add),
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Acción para agregar al carrito
+                  // Acción para agregar al carrito con la cantidad seleccionada
                 },
                 child: Text(
                   'Agregar',
                   style: TextStyle(
                     fontFamily: 'FredokaOne',
                     fontSize: 16,
-                    color: Colors.white,
+                    color: isDarkMode
+                        ? Color.fromARGB(255, 255, 255, 254)
+                        : Color.fromARGB(255, 44, 44, 44),
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 9, 73, 36),
+                  primary: isDarkMode
+                      ? const Color.fromARGB(255, 53, 87, 54)
+                      : Color.fromARGB(255, 99, 151, 102),
                 ),
               ),
             ],
@@ -218,6 +243,10 @@ class _ProductCardState extends State<ProductCard> {
 }
 
 class CustomPopupMenuButton extends StatelessWidget {
+  final bool isDarkMode;
+  const CustomPopupMenuButton({Key? key, required this.isDarkMode})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
@@ -251,7 +280,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -262,7 +291,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -273,7 +302,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'FredokaOne',
               fontSize: 20,
-              color: Color.fromARGB(255, 9, 73, 36),
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -287,7 +316,7 @@ class CustomPopupMenuButton extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'FredokaOne',
                 fontSize: 20,
-                color: Color.fromARGB(255, 232, 235, 232),
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
           ),

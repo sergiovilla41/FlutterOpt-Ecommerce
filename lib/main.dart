@@ -20,8 +20,6 @@ class LoginApp extends StatelessWidget {
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     // Retorna un MaterialApp, que es la raíz de la aplicación
     return MaterialApp(
-      // Desactiva el banner de depuración en la esquina superior derecha
-      debugShowCheckedModeBanner: false,
       // Título de la aplicación
       title: 'Login App',
       // Tema de la aplicación
