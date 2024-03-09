@@ -3,8 +3,6 @@ import 'package:mi_app_optativa/src/Pages/sing_in.dart';
 import 'package:mi_app_optativa/src/Widgets/icon_container.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }

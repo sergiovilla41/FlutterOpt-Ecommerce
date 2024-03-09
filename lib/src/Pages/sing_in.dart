@@ -6,6 +6,7 @@ import 'package:mi_app_optativa/src/Pages/Cart.dart' as CartPage;
 import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/ropa.dart';
 import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+import 'package:mi_app_optativa/src/Pages/product.dart'; // Importación de la clase Product
 
 void main() {
   runApp(MaterialApp(
@@ -32,6 +33,14 @@ class _SignInState extends State<SignIn> {
   int totalProducts = 0;
   Set<int> uniqueProductIds = {};
 
+  void addToCart(Product product, int quantity) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Agregado al carrito: ${product.title} x $quantity'),
+      duration: Duration(seconds: 1),
+    ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +53,8 @@ class _SignInState extends State<SignIn> {
     if (response.statusCode == 200) {
       setState(() {
         products = (json.decode(response.body) as List)
-            .map((data) => Product.fromJson(data))
+            .map((data) =>
+                Product.fromJson(data)) // Utilización de la clase Product
             .toList();
       });
     } else {
@@ -208,31 +218,6 @@ class _SignInState extends State<SignIn> {
   }
 }
 
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String image;
-  int quantity;
-
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.image,
-    this.quantity = 0,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      image: json['image'],
-    );
-  }
-}
-
 class ProductCard extends StatefulWidget {
   final Product product;
   final bool isDarkMode;
@@ -252,6 +237,26 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
+  void addToCart(Product product, int quantity) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Agregado al carrito: ${product.title} x $quantity',
+          style: TextStyle(
+            color: widget.isDarkMode
+                ? Color.fromARGB(255, 255, 255, 255)
+                : Color.fromARGB(255, 10, 10, 10),
+          ),
+        ),
+        duration: Duration(seconds: 1),
+        backgroundColor: widget.isDarkMode
+            ? Colors.grey[800]
+            : Color.fromARGB(255, 119, 146, 114),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -333,6 +338,9 @@ class _ProductCardState extends State<ProductCard> {
                   SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () {
+                      addToCart(widget.product,
+                          1); // Llama al método addToCart con el producto actual y la cantidad
+
                       widget.product.quantity = widget.product.quantity == 0
                           ? 1
                           : widget.product.quantity;
@@ -344,7 +352,9 @@ class _ProductCardState extends State<ProductCard> {
                       style: TextStyle(
                         fontFamily: 'FredokaOne',
                         fontSize: 16,
-                        color: widget.isDarkMode ? Colors.black : Colors.white,
+                        color: widget.isDarkMode
+                            ? const Color.fromARGB(255, 240, 239, 239)
+                            : const Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(

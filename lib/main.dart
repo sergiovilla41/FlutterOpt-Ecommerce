@@ -15,6 +15,7 @@ void main() {
 class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     // Establece las orientaciones preferidas del dispositivo como vertical
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -30,6 +31,11 @@ class LoginApp extends StatelessWidget {
         hintColor: Color.fromARGB(255, 67, 105, 34),
         // Densidad visual adaptativa
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ), // Cambia el color aquí
+        ),
       ),
       // Ruta inicial de la aplicación
       initialRoute: 'Home',

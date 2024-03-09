@@ -1,42 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mi_app_optativa/src/Pages/Cart.dart';
 import 'dart:convert';
 
 import 'package:mi_app_optativa/src/Pages/joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/ropa.dart';
+import 'package:mi_app_optativa/src/Pages/product.dart';
 
 void main() {
   runApp(MaterialApp(
     home: tecnologia(),
   ));
-}
-
-class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String category;
-  final String image;
-  int quantity;
-
-  Product({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.category,
-    required this.image,
-    this.quantity = 0,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      title: json['title'],
-      price: json['price'].toDouble(),
-      category: json['category'],
-      image: json['image'],
-    );
-  }
 }
 
 class tecnologia extends StatefulWidget {
@@ -48,7 +22,8 @@ class tecnologia extends StatefulWidget {
 
 class _tecnologiaState extends State<tecnologia> {
   List<Product> products = [];
-
+  Set<int> uniqueProductIds = {};
+  int totalProducts = 0;
   @override
   void initState() {
     super.initState();
@@ -69,17 +44,45 @@ class _tecnologiaState extends State<tecnologia> {
     }
   }
 
+  void updateUniqueProductIds() {
+    setState(() {
+      uniqueProductIds.clear();
+      for (var product in products) {
+        if (product.quantity > 0) {
+          uniqueProductIds.add(product.id);
+        }
+      }
+    });
+  }
+
+  void updateTotalProducts() {
+    setState(() {
+      totalProducts = _calculateTotalProducts();
+    });
+  }
+
+  int _calculateTotalProducts() {
+    int total = 0;
+    for (var product in products) {
+      total += product.quantity;
+    }
+    return total;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    int totalUniqueProducts =
+        uniqueProductIds.length; // Define totalUniqueProducts aquí
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           ' Tecnología',
           style: TextStyle(
             fontFamily: 'FredokaOne',
-            fontSize: 20,
-            color: Colors.white, // Color del texto del AppBar
+            fontSize: 30,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
         backgroundColor: isDarkMode
@@ -90,27 +93,60 @@ class _tecnologiaState extends State<tecnologia> {
               isDarkMode: isDarkMode), // Muestra el menú desplegable
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ShoppingCartPage(products: products)),
-          );
-        },
-        child: Icon(Icons.shopping_cart),
-        backgroundColor: const Color.fromARGB(255, 58, 100, 59),
-        foregroundColor: isDarkMode
-            ? Colors.white
-            : Colors.black, // Color de fondo del botón
+      floatingActionButton: Stack(
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShoppingCartPage(
+                    products: products,
+                    isDarkMode: isDarkMode,
+                  ),
+                ),
+              );
+            },
+            child: Icon(Icons.shopping_cart),
+            backgroundColor: const Color.fromARGB(255, 58, 100, 59),
+            foregroundColor: isDarkMode ? Colors.white : Colors.black,
+          ),
+          Positioned(
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              constraints: BoxConstraints(
+                minWidth: 16,
+                minHeight: 16,
+              ),
+              child: Text(
+                totalUniqueProducts.toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: <Color>[
-              Color.fromARGB(255, 9, 73, 36),
-              Color.fromARGB(0, 80, 239, 191),
-            ],
+            colors: isDarkMode
+                ? [
+                    Color.fromARGB(255, 36, 70, 36),
+                    Color.fromARGB(179, 22, 24, 23),
+                  ]
+                : [
+                    Color.fromARGB(255, 123, 153, 114),
+                    Color.fromARGB(0, 191, 255, 191),
+                  ],
             begin: Alignment.topCenter,
           ),
         ),
@@ -119,20 +155,28 @@ class _tecnologiaState extends State<tecnologia> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Store:',
+              'Store',
               style: TextStyle(
                 fontFamily: 'FredokaOne',
-                fontSize: 20,
-                color: Color.fromARGB(255, 225, 228, 226),
+                fontSize: 30,
+                color: isDarkMode
+                    ? Color.fromARGB(255, 255, 255, 255)
+                    : Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  return ProductCard(product: product);
+                  return ProductCard(
+                    product: product,
+                    isDarkMode: isDarkMode,
+                    updateTotalProducts: updateTotalProducts,
+                    updateUniqueProductIds: updateUniqueProductIds,
+                  );
                 },
               ),
             ),
@@ -145,119 +189,156 @@ class _tecnologiaState extends State<tecnologia> {
 
 class ProductCard extends StatefulWidget {
   final Product product;
+  final bool isDarkMode;
+  final VoidCallback updateTotalProducts;
+  final VoidCallback updateUniqueProductIds;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({
+    Key? key,
+    required this.product,
+    required this.isDarkMode,
+    required this.updateTotalProducts,
+    required this.updateUniqueProductIds,
+  }) : super(key: key);
 
   @override
   _ProductCardState createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard> {
-  int quantity = 0;
+  void addToCart(Product product, int quantity) {
+    product.quantity += quantity;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Agregado al carrito: ${product.title} x $quantity',
+          style: TextStyle(
+            color: widget.isDarkMode
+                ? Color.fromARGB(255, 255, 255, 255)
+                : Color.fromARGB(255, 10, 10, 10),
+          ),
+        ),
+        duration: Duration(seconds: 1),
+        backgroundColor: widget.isDarkMode
+            ? Colors.grey[800]
+            : Color.fromARGB(255, 119, 146, 114),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
       elevation: 4,
-      child: Column(
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 130, // Altura fija de la tarjeta
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Image.network(
                 widget.product.image,
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          ListTile(
-            title: Text(
-              widget.product.title,
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 14, // Ajusta el tamaño del texto
-                color:
-                    isDarkMode ? Colors.white : Color.fromARGB(255, 10, 10, 10),
-              ),
-            ),
-            subtitle: Text(
-              '\$${widget.product.price.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 14, // Ajusta el tamaño del texto
-                color:
-                    isDarkMode ? Colors.white : Color.fromARGB(255, 15, 15, 15),
-              ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Centra los botones
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    if (quantity > 0) {
-                      quantity--;
-                    }
-                  });
-                },
-                icon: Icon(Icons.remove),
-              ),
-              Text(
-                quantity.toString(), // Muestra la cantidad actual
-                style: TextStyle(
-                  fontFamily: 'FredokaOne',
-                  fontSize: 14, // Ajusta el tamaño del texto
-                  color: isDarkMode
-                      ? Colors.white
-                      : Color.fromARGB(255, 18, 19, 18),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    quantity++;
-                  });
-                },
-                icon: Icon(Icons.add),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  addToCart(widget.product, quantity);
-                },
-                child: Text(
-                  'Agregar',
-                  style: TextStyle(
-                    fontFamily: 'FredokaOne',
-                    fontSize: 16,
-                    color: isDarkMode
-                        ? Color.fromARGB(255, 255, 255, 254)
-                        : Color.fromARGB(255, 44, 44, 44),
+          Expanded(
+            flex: 7,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.product.title,
+                    style: TextStyle(
+                      fontFamily: 'FredokaOne',
+                      fontSize: 16,
+                      color: widget.isDarkMode ? Colors.white : Colors.black,
+                    ),
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: isDarkMode
-                      ? const Color.fromARGB(255, 53, 87, 54)
-                      : Color.fromARGB(255, 99, 151, 102),
-                ),
+                  SizedBox(height: 8),
+                  Text(
+                    '\$${widget.product.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontFamily: 'FredokaOne',
+                      fontSize: 16,
+                      color: widget.isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (widget.product.quantity > 0) {
+                              widget.product.quantity--;
+                              widget.updateTotalProducts();
+                              widget.updateUniqueProductIds();
+                            }
+                          });
+                        },
+                        icon: Icon(Icons.remove),
+                      ),
+                      Text(
+                        widget.product.quantity.toString(),
+                        style: TextStyle(
+                          fontFamily: 'FredokaOne',
+                          fontSize: 16,
+                          color: widget.isDarkMode
+                              ? Color.fromARGB(255, 233, 229, 229)
+                              : Colors.black,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            widget.product.quantity++;
+                            widget.updateTotalProducts();
+                            widget.updateUniqueProductIds();
+                          });
+                        },
+                        icon: Icon(Icons.add),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      addToCart(widget.product,
+                          1); // Llama al método addToCart con el producto actual y la cantidad
+
+                      widget.product.quantity = widget.product.quantity == 0
+                          ? 1
+                          : widget.product.quantity;
+                      widget.updateTotalProducts();
+                      widget.updateUniqueProductIds();
+                    },
+                    child: Text(
+                      'Agregar +',
+                      style: TextStyle(
+                        fontFamily: 'FredokaOne',
+                        fontSize: 16,
+                        color: widget.isDarkMode
+                            ? const Color.fromARGB(255, 240, 239, 239)
+                            : const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: widget.isDarkMode
+                          ? Color.fromARGB(255, 53, 87, 54)
+                          : Color.fromARGB(255, 99, 151, 102),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
-  }
-
-  void addToCart(Product product, int quantity) {
-    product.quantity += quantity;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Agregado al carrito: ${product.title} x $quantity'),
-      duration: Duration(seconds: 1),
-    ));
   }
 }
 
@@ -339,57 +420,11 @@ class CustomPopupMenuButton extends StatelessWidget {
               ),
             ),
           ),
-          Icon(Icons.arrow_drop_down),
-        ],
-      ),
-    );
-  }
-}
-
-class ShoppingCartPage extends StatelessWidget {
-  final List<Product> products;
-
-  const ShoppingCartPage({Key? key, required this.products}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    double total = 0;
-
-    // Calcular el total del carrito
-    for (var product in products) {
-      total += product.price * product.quantity;
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Carrito de compras'),
-      ),
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ListTile(
-            title: Text(product.title),
-            subtitle: Text('Cantidad: ${product.quantity}'),
-            trailing: Text(
-                '\$${(product.price * product.quantity).toStringAsFixed(2)}'),
-            onTap: () {
-              // Acción al hacer clic en un producto (opcional)
-            },
-          );
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Total: \$${total.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
+          Icon(
+            Icons.arrow_drop_down,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
-        ),
+        ],
       ),
     );
   }
