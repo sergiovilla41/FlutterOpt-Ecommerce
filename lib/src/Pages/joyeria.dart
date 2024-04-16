@@ -1,15 +1,23 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
+import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
+import 'package:mi_app_optativa/src/Models/product.dart';
 import 'package:mi_app_optativa/src/Pages/Cart.dart';
-import 'package:mi_app_optativa/src/Pages/product.dart';
-import 'package:mi_app_optativa/src/Pages/ropa.dart';
-import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
+import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
+import 'package:provider/provider.dart';
+import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
+    as Menu;
 
-void main() {
-  runApp(MaterialApp(
-    home: joyeria(),
-  ));
+class Joyeria extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => CartController(), // Instancia de CartController
+      child: joyeria(),
+    );
+  }
 }
 
 class joyeria extends StatefulWidget {
@@ -17,60 +25,56 @@ class joyeria extends StatefulWidget {
   _joyeriaState createState() => _joyeriaState();
 }
 
-class _joyeriaState extends State<joyeria> {
+class _joyeriaState extends State<joyeria> implements CartObserver {
   List<Product> products = [];
+  bool isDarkMode = false;
   int totalUniqueProducts = 0;
-
-  void updateTotalProducts() {
-    int total = 0;
-    for (var product in products) {
-      total += product.quantity;
-    }
-    setState(() {
-      totalUniqueProducts = total;
-    });
-  }
-
-  Set<int> uniqueProductIds = {};
-
-  void updateUniqueProductIds() {
-    Set<int> uniqueIds = {};
-    for (var product in products) {
-      if (product.quantity > 0) {
-        uniqueIds.add(product.id);
-      }
-    }
-    setState(() {
-      uniqueProductIds = uniqueIds;
-    });
-  }
+  final ProductService _productService = ProductService();
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    CartController.addObserver(this);
+    _loadProducts();
+    setState(() {});
   }
 
-  Future<void> fetchProducts() async {
-    final response = await http
-        .get(Uri.parse('https://fakestoreapi.com/products/category/jewelery'));
-    if (response.statusCode == 200) {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void onCartUpdated() {
+    setState(() {
+      CartController.updateTotalUniqueProducts(CartController.getCartItems());
+    });
+  }
+
+  //Metodo para cargar los productos desde el Service
+  void _loadProducts() async {
+    try {
+      List<Product> fetchedProducts =
+          await _productService.fetchProducts(category: 'jewelery');
       setState(() {
-        products = (json.decode(response.body) as List)
-            .map((data) => Product.fromJson(data))
-            .toList();
+        products = fetchedProducts;
       });
-    } else {
-      throw Exception('Failed to load products');
+    } catch (e) {
+      // Handle error
+      print('Error fetching products: $e');
     }
+  }
+
+  void _updateCartItemCount(int itemCount) {
+    // Actualiza el estado de tu página o realiza cualquier otra acción necesaria con el contador del carrito
+    setState(() {
+      // Actualiza el estado de tu widget con el nuevo número de ítems en el carrito
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    int totalUniqueProducts =
-        uniqueProductIds.length; // Define totalUniqueProducts aquí
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -84,52 +88,25 @@ class _joyeriaState extends State<joyeria> {
         backgroundColor: isDarkMode
             ? const Color.fromARGB(255, 61, 60, 60)
             : Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+        leading: IconButton(
+          // Aquí está el IconButton para la flecha hacia atrás
+          icon: Icon(
+            Icons.arrow_back, // Icono de flecha hacia atrás
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(
+                context); // Esto hará que la pantalla retroceda cuando se presione el botón de flecha hacia atrás
+          },
+        ),
         actions: [
-          CustomPopupMenuButton(
+          Menu.CustomPopupMenuButton(
               isDarkMode: isDarkMode), // Muestra el menú desplegable
         ],
       ),
-      floatingActionButton: Stack(
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ShoppingCartPage(
-                    products: products,
-                    isDarkMode: isDarkMode,
-                  ),
-                ),
-              );
-            },
-            child: Icon(Icons.shopping_cart),
-            backgroundColor: const Color.fromARGB(255, 58, 100, 59),
-            foregroundColor: isDarkMode ? Colors.white : Colors.black,
-          ),
-          Positioned(
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              constraints: BoxConstraints(
-                minWidth: 16,
-                minHeight: 16,
-              ),
-              child: Text(
-                totalUniqueProducts.toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-          ),
-        ],
+      floatingActionButton: FloatingCartButton(
+        products: products,
+        isDarkMode: isDarkMode,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -167,223 +144,24 @@ class _joyeriaState extends State<joyeria> {
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) {
                   final product = products[index];
-                  return ProductCard(
+                  return Cart.ProductCard(
                     product: product,
                     isDarkMode: isDarkMode,
-                    updateTotalProducts: updateTotalProducts,
-                    updateUniqueProductIds: updateUniqueProductIds,
+                    addToCart: (context, product, quantity) {
+                      CartController.addToCart(context, product, quantity);
+                    },
+                    incrementQuantity: (product) {
+                      CartController.incrementQuantity(product);
+                    },
+                    decrementQuantity: (product) {
+                      CartController.decrementQuantity(product);
+                    },
                   );
                 },
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatefulWidget {
-  final Product product;
-  final bool isDarkMode;
-  final VoidCallback updateTotalProducts;
-  final VoidCallback updateUniqueProductIds;
-
-  const ProductCard({
-    Key? key,
-    required this.product,
-    required this.isDarkMode,
-    required this.updateTotalProducts,
-    required this.updateUniqueProductIds,
-  }) : super(key: key);
-
-  @override
-  _ProductCardState createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<ProductCard> {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      elevation: 4,
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 130,
-              child: Image.network(
-                widget.product.image,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          ListTile(
-            title: Text(
-              widget.product.title,
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 16,
-                color: widget.isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            subtitle: Text(
-              '\$${widget.product.price.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 16,
-                color: widget.isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    if (widget.product.quantity > 0) {
-                      widget.product.quantity--;
-                      widget.updateTotalProducts();
-                      widget.updateUniqueProductIds();
-                    }
-                  });
-                },
-                icon: Icon(Icons.remove),
-              ),
-              Text(
-                widget.product.quantity.toString(),
-                style: TextStyle(
-                  fontFamily: 'FredokaOne',
-                  fontSize: 16,
-                  color: widget.isDarkMode
-                      ? Color.fromARGB(255, 233, 229, 229)
-                      : Colors.black,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    widget.product.quantity++;
-                    widget.updateTotalProducts();
-                    widget.updateUniqueProductIds();
-                  });
-                },
-                icon: Icon(Icons.add),
-              ),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  widget.product.quantity = widget.product.quantity == 0
-                      ? 1
-                      : widget.product.quantity;
-                  widget.updateTotalProducts();
-                  widget.updateUniqueProductIds();
-                },
-                child: Text(
-                  'Agregar +',
-                  style: TextStyle(
-                    fontFamily: 'FredokaOne',
-                    fontSize: 16,
-                    color: widget.isDarkMode
-                        ? const Color.fromARGB(255, 252, 252, 252)
-                        : const Color.fromARGB(255, 0, 0, 0),
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: widget.isDarkMode
-                      ? Color.fromARGB(255, 53, 87, 54)
-                      : Color.fromARGB(255, 99, 151, 102),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CustomPopupMenuButton extends StatelessWidget {
-  final bool isDarkMode;
-  const CustomPopupMenuButton({Key? key, required this.isDarkMode})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-        switch (value) {
-          case 'joyeria':
-            break;
-          case 'tecnologia':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => tecnologia()),
-            );
-            break;
-          case 'ropa':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ropa()),
-            );
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'joyeria',
-          child: Text(
-            'Joyería',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'tecnologia',
-          child: Text(
-            'Tecnología',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'ropa',
-          child: Text(
-            'Ropa',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-      ],
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              'Menú',
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 20,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.arrow_drop_down,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ],
       ),
     );
   }

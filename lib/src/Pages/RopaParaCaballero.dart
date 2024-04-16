@@ -3,25 +3,23 @@ import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
 import 'package:mi_app_optativa/src/Pages/Cart.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
+import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
+import 'package:mi_app_optativa/src/Pages/Tecnologia.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
-import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
-    as Menu;
 
-class tecnologia extends StatefulWidget {
-  const tecnologia({super.key});
-
+class RopaCaballero extends StatefulWidget {
   @override
-  _tecnologiaState createState() => _tecnologiaState();
+  _RopaCaballeroState createState() => _RopaCaballeroState();
 }
 
-class _tecnologiaState extends State<tecnologia> implements CartObserver {
+class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
   List<Product> products = [];
   bool isDarkMode = false;
   int totalUniqueProducts = 0;
   final ProductService _productService = ProductService();
-
   @override
   void initState() {
     super.initState();
@@ -47,7 +45,7 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
   void _loadProducts() async {
     try {
       List<Product> fetchedProducts =
-          await _productService.fetchProducts(category: 'electronics');
+          await _productService.fetchProducts(category: 'men%27s%20clothing');
       setState(() {
         products = fetchedProducts;
       });
@@ -89,7 +87,7 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' Tecnología',
+          ' Ropa',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 30,
@@ -111,7 +109,7 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
           },
         ),
         actions: [
-          Menu.CustomPopupMenuButton(
+          CustomPopupMenuButton(
               isDarkMode: isDarkMode), // Muestra el menú desplegable
         ],
       ),
@@ -167,6 +165,111 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CustomPopupMenuButton extends StatelessWidget {
+  final bool isDarkMode;
+  const CustomPopupMenuButton({Key? key, required this.isDarkMode})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (String value) {
+        switch (value) {
+          case 'joyeria':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => joyeria()),
+            );
+            break;
+          case 'tecnologia':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => tecnologia()),
+            );
+            break;
+          case 'ropaCaballero': // Agregar la opción para la página RopaCaballero
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RopaCaballero()),
+            );
+            break;
+          case 'ropaDama':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RopaDama()),
+            );
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'joyeria',
+          child: Text(
+            'Joyería',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'tecnologia',
+          child: Text(
+            'Tecnología',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'ropaCaballero',
+          child: Text(
+            'Ropa Caballero',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'ropaDama',
+          child: Text(
+            'Ropa Dama',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ],
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Menú',
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 20,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          Icon(
+            Icons.arrow_drop_down,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ],
       ),
     );
   }

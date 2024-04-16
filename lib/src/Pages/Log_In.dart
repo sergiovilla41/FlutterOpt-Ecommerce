@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:mi_app_optativa/src/Pages/sing_in.dart';
+import 'package:mi_app_optativa/src/Models/Usuarios.dart';
+import 'package:mi_app_optativa/src/Pages/Home.dart';
+import 'package:mi_app_optativa/src/Service/LoginService.dart';
 import 'package:mi_app_optativa/src/Widgets/icon_container.dart';
 
-class HomePage extends StatefulWidget {
+class LogIn extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _LogInState createState() => _LogInState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LogInState extends State<LogIn> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  UserService _userService =
+      UserService(); // Instancia del servicio UserService
 
   @override
   Widget build(BuildContext context) {
-    // Construye una página con una estructura de diseño específica
     return Scaffold(
       body: Container(
-        // Ocupa todo el ancho y alto disponible
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          // Aplica un degradado como fondo
           gradient: LinearGradient(
             colors: <Color>[
               Color.fromARGB(255, 9, 73, 36),
@@ -30,17 +31,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         child: ListView(
-          // Añade un padding alrededor de la lista
           padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 200),
           children: <Widget>[
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Widget personalizado que muestra un icono
                 IconContainer(
                   url: 'images/oso.png',
                 ),
-                // Texto de bienvenida
                 Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -48,11 +46,9 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 38.0,
                   ),
                 ),
-                // Separador
                 Divider(
                   height: 20.0,
                 ),
-                // Campo de texto para el nombre de usuario
                 SizedBox(
                   width: double.infinity,
                   height: 60.0,
@@ -66,16 +62,12 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-                      errorText: _usernameController.text.isEmpty
-                          ? 'Username is required'
-                          : null,
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 20.0,
                 ),
-                // Campo de texto para la contraseña
                 SizedBox(
                   width: double.infinity,
                   height: 60.0,
@@ -90,9 +82,6 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
-                      errorText: _passwordController.text.isEmpty
-                          ? 'Password is required'
-                          : null,
                     ),
                   ),
                 ),
@@ -100,70 +89,77 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   height: 60.0,
                   child: TextButton(
-                    // Define un estilo para el botón
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.resolveWith<double>(
                         (Set<MaterialState> states) {
                           if (states.contains(MaterialState.hovered)) {
-                            return 4; // Elevación cuando el botón está resaltado
+                            return 4;
                           }
-                          return 2; // Elevación predeterminada
+                          return 2;
                         },
                       ),
                       backgroundColor: MaterialStateProperty.all(
                           const Color.fromARGB(146, 105, 240, 175)),
                     ),
-                    onPressed: () {
-                      // Acción al presionar el botón de inicio de sesión
-                      final route = MaterialPageRoute(
-                        builder: (context) => SignIn(
-                            username: _usernameController.text,
-                            password: _passwordController.text),
-                      );
-                      // Navega a la página de inicio de sesión
-                      Navigator.push(context, route);
-
-                      // Muestra una ventana emergente de "acceso concedido"
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text(
-                              'Acceso concedido',
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 56, 83, 30),
-                                fontFamily: 'FredokaOne',
-                                fontSize:
-                                    20.0, // Tamaño de la fuente para el título
-                              ),
-                            ),
-                            content: Text(
-                              'Welcome ${_usernameController.text}!',
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 56, 83, 30),
-                                fontFamily: 'FredokaOne',
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  // Cierra la ventana emergente
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  'Close',
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 56, 83, 30),
-                                    fontFamily: 'FredokaOne',
-                                  ),
+                    onPressed: () async {
+                      // Obtiene la lista de usuarios
+                      List<User> users = await _userService.fetchUsers();
+                      // Valida las credenciales ingresadas por el usuario
+                      bool validCredentials = false;
+                      for (User user in users) {
+                        if (user.username == _usernameController.text &&
+                            user.password == _passwordController.text) {
+                          validCredentials = true;
+                          break;
+                        }
+                      }
+                      if (validCredentials) {
+                        final route = MaterialPageRoute(
+                          builder: (context) => Home(
+                              username: _usernameController.text,
+                              password: _passwordController.text),
+                        );
+                        Navigator.push(context, route);
+                      } else {
+                        // Muestra una ventana emergente de "acceso denegado"
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                'Access Denied',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 56, 83, 30),
+                                  fontFamily: 'FredokaOne',
+                                  fontSize: 20.0,
                                 ),
                               ),
-                            ],
-                          );
-                        },
-                      );
+                              content: Text(
+                                'Invalid username or password',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 56, 83, 30),
+                                  fontFamily: 'FredokaOne',
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 56, 83, 30),
+                                      fontFamily: 'FredokaOne',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
-                    // Texto del botón
                     child: Text(
                       'Sign In',
                       style: TextStyle(

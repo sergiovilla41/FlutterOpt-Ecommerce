@@ -9,19 +9,16 @@ import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
 import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
     as Menu;
 
-class tecnologia extends StatefulWidget {
-  const tecnologia({super.key});
-
+class RopaDama extends StatefulWidget {
   @override
-  _tecnologiaState createState() => _tecnologiaState();
+  _RopaDamaState createState() => _RopaDamaState();
 }
 
-class _tecnologiaState extends State<tecnologia> implements CartObserver {
+class _RopaDamaState extends State<RopaDama> implements CartObserver {
   List<Product> products = [];
   bool isDarkMode = false;
   int totalUniqueProducts = 0;
   final ProductService _productService = ProductService();
-
   @override
   void initState() {
     super.initState();
@@ -47,7 +44,7 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
   void _loadProducts() async {
     try {
       List<Product> fetchedProducts =
-          await _productService.fetchProducts(category: 'electronics');
+          await _productService.fetchProducts(category: "women's%20clothing");
       setState(() {
         products = fetchedProducts;
       });
@@ -89,7 +86,7 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' Tecnología',
+          ' Ropa',
           style: TextStyle(
             fontFamily: 'FredokaOne',
             fontSize: 30,

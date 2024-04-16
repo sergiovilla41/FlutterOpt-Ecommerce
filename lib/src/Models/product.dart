@@ -24,4 +24,6 @@ class Product {
       image: json['image'],
     );
   }
+
+  get counter => null;
 }

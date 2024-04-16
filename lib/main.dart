@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mi_app_optativa/src/Pages/home_page.dart';
-import 'package:mi_app_optativa/src/Pages/joyeria.dart';
-import 'package:mi_app_optativa/src/Pages/ropa.dart';
-import 'package:mi_app_optativa/src/Pages/sing_in.dart';
-import 'package:mi_app_optativa/src/Pages/tecnologia.dart';
+import 'package:mi_app_optativa/src/Pages/Log_In.dart';
+import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
+import 'package:mi_app_optativa/src/Pages/RopaParaCaballero.dart';
+import 'package:mi_app_optativa/src/Pages/Home.dart';
+import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
+import 'package:mi_app_optativa/src/Pages/Tecnologia.dart';
+import 'package:mi_app_optativa/src/Controllers/TemaController.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  // Inicia la aplicación llamando al widget LoginApp
-  runApp(LoginApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) =>
+          TemaController(), // Crea una instancia de TemaController
+      child: LoginApp(), // Utiliza LoginApp como widget principal
+    ),
+  );
 }
 
 // Widget principal que representa la aplicación de inicio de sesión
@@ -38,13 +46,13 @@ class LoginApp extends StatelessWidget {
         ),
       ),
       // Ruta inicial de la aplicación
-      initialRoute: 'Home',
+      initialRoute: 'LogIn',
       // Mapeo de rutas de la aplicación con los constructores de los widgets correspondientes
       routes: <String, WidgetBuilder>{
         // Ruta para la página de inicio
-        'Home': (BuildContext context) => HomePage(),
+        'LogIn': (BuildContext context) => LogIn(),
         // Ruta para la página de inicio de sesión
-        'SingIn': (BuildContext context) => SignIn(
+        'Home': (BuildContext context) => Home(
               username: '',
               password: '',
             ),
@@ -52,8 +60,9 @@ class LoginApp extends StatelessWidget {
         'Tecnología': (BuildContext context) => tecnologia(),
         // Ruta para la página de joyería
         'Joyería': (BuildContext context) => joyeria(),
-        // Ruta para la página de ropa
-        'Ropa': (BuildContext context) => ropa(),
+        // Ruta para la página de ropa para caballero
+        'RopaCaballero': (BuildContext context) => RopaCaballero(),
+        'RopaDama': (BuildContext context) => RopaDama(),
       },
     );
   }
