@@ -26,7 +26,7 @@ class CartController extends ChangeNotifier {
 
   static void addToCart(BuildContext context, Product product, int quantity) {
     _cartItems.firstWhereOrNull((item) => item.id == product.id);
-    if (quantity > 1) {
+    if (quantity >= 1) {
       // Verifica si la cantidad es mayor que 1
       _cartItems.add(product);
 
