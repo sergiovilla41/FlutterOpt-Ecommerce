@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
-import 'package:mi_app_optativa/src/Pages/Cart.dart';
+import 'package:mi_app_optativa/src/Models/Avatar.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
-import 'package:provider/provider.dart';
 import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
     as Menu;
 
@@ -20,23 +20,12 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ChangeNotifierProvider(
-        create: (context) => CartController(), // Instancia de CartController
-        child: Home(username: 'Usuario', password: ''),
-      ),
-    );
-  }
-}
-
 class _HomeState extends State<Home> implements CartObserver {
   List<Product> products = [];
   bool isDarkMode = false;
   int totalUniqueProducts = 0;
   final ProductService _productService = ProductService();
+  Avatar? _selectedAvatar;
 
   @override
   void initState() {
@@ -84,13 +73,28 @@ class _HomeState extends State<Home> implements CartObserver {
       theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'User: ${widget.username}',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
+          title: Row(
+            children: [
+              Text(
+                'User: ${widget.username}',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 20,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              SizedBox(width: 8),
+              AvatarWidget(
+                // Nuevo
+                avatar: _selectedAvatar, // Nuevo
+                onSelectAvatar: (avatar) {
+                  // Nuevo
+                  setState(() {
+                    _selectedAvatar = avatar;
+                  });
+                }, // Nuevo
+              ), // Nuevo
+            ],
           ),
           backgroundColor: isDarkMode
               ? const Color.fromARGB(255, 61, 60, 60)

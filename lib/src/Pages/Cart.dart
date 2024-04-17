@@ -28,16 +28,9 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     return total;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Inicializa la lista de productos en el carrito
-    _cartItems.addAll(widget.products.where((product) => product.quantity > 0));
-  }
-
   void _updateCartItemCount() {
     // Actualiza la lista de productos en el carrito
-    _cartItems.clear();
+    // _cartItems.clear();
     _cartItems.addAll(CartController.getCartItems());
 
     // Recalcula la cantidad total de productos en el carrito

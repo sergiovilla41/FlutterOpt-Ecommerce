@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mi_app_optativa/src/Pages/AvatarPickerPage.dart';
 import 'package:mi_app_optativa/src/Pages/Log_In.dart';
 import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaCaballero.dart';
 import 'package:mi_app_optativa/src/Pages/Home.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
 import 'package:mi_app_optativa/src/Pages/Tecnologia.dart';
-import 'package:mi_app_optativa/src/Controllers/TemaController.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) =>
-          TemaController(), // Crea una instancia de TemaController
-      child: LoginApp(), // Utiliza LoginApp como widget principal
-    ),
-  );
+  runApp(LoginApp()); // Utiliza LoginApp como widget principal
 }
 
 // Widget principal que representa la aplicación de inicio de sesión
@@ -63,6 +56,7 @@ class LoginApp extends StatelessWidget {
         // Ruta para la página de ropa para caballero
         'RopaCaballero': (BuildContext context) => RopaCaballero(),
         'RopaDama': (BuildContext context) => RopaDama(),
+        'AvatarPickerPage': (BuildContext context) => AvatarPickerPage(),
       },
     );
   }
