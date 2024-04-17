@@ -156,7 +156,7 @@ class _HomeState extends State<Home> implements CartObserver {
               ),
               SizedBox(
                 height:
-                    120, // Especifica la altura deseada del DescuentosCarousel
+                    100, // Especifica la altura deseada del DescuentosCarousel
                 child: DescuentosCarousel(
                   descuentosList: datosDescuentosMock,
                   interval: Duration(seconds: 3),

@@ -94,12 +94,12 @@ class _RopaDamaState extends State<RopaDama> implements CartObserver {
           children: [
             Container(
               margin: EdgeInsets.only(
-                  right: 16), // Ajusta el margen derecho según sea necesario
+                  right: 2), // Ajusta el margen derecho según sea necesario
               child: Text(
-                ' Ropa Damas',
+                'Ropa',
                 style: TextStyle(
                   fontFamily: 'FredokaOne',
-                  fontSize: 30,
+                  fontSize: 22,
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
