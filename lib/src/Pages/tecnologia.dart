@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
+import 'package:mi_app_optativa/src/Models/Avatar.dart';
 import 'package:mi_app_optativa/src/Pages/Cart.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
 import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
     as Menu;
+import 'package:provider/provider.dart';
 
 class tecnologia extends StatefulWidget {
   const tecnologia({super.key});
@@ -86,15 +90,31 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final selectedAvatar = Provider.of<AvatarProvider>(context).selectedAvatar;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          ' Tecnología',
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 30,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
+        title: Row(
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  right: 16), // Ajusta el margen derecho según sea necesario
+              child: Text(
+                ' Tecnología',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 30,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+            AvatarWidget(
+              avatar: selectedAvatar,
+              onSelectAvatar: (avatar) {
+                Provider.of<AvatarProvider>(context, listen: false)
+                    .setSelectedAvatar(avatar);
+              },
+            ),
+          ],
         ),
         backgroundColor: isDarkMode
             ? const Color.fromARGB(255, 61, 60, 60)
@@ -112,7 +132,8 @@ class _tecnologiaState extends State<tecnologia> implements CartObserver {
         ),
         actions: [
           Menu.CustomPopupMenuButton(
-              isDarkMode: isDarkMode), // Muestra el menú desplegable
+            isDarkMode: isDarkMode,
+          ),
         ],
       ),
       floatingActionButton: FloatingCartButton(

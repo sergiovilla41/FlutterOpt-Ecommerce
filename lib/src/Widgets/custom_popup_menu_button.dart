@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app_optativa/src/Pages/Home.dart';
 import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaCaballero.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
@@ -14,6 +15,16 @@ class CustomPopupMenuButton extends StatelessWidget {
     return PopupMenuButton<String>(
       onSelected: (String value) {
         switch (value) {
+          case 'home':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Home(
+                        username: '',
+                        password: '',
+                      )),
+            );
+            break;
           case 'joyeria':
             Navigator.push(
               context,
@@ -26,7 +37,7 @@ class CustomPopupMenuButton extends StatelessWidget {
               MaterialPageRoute(builder: (context) => tecnologia()),
             );
             break;
-          case 'ropaCaballero': // Agregar la opción para la página RopaCaballero
+          case 'ropaCaballero':
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => RopaCaballero()),
@@ -41,6 +52,17 @@ class CustomPopupMenuButton extends StatelessWidget {
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'home',
+          child: Text(
+            'Home',
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
         PopupMenuItem<String>(
           value: 'joyeria',
           child: Text(

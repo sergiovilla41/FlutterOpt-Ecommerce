@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Pages/AvatarPickerPage.dart';
 import 'package:mi_app_optativa/src/Pages/Log_In.dart';
 import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
@@ -7,9 +8,16 @@ import 'package:mi_app_optativa/src/Pages/RopaParaCaballero.dart';
 import 'package:mi_app_optativa/src/Pages/Home.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
 import 'package:mi_app_optativa/src/Pages/Tecnologia.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(LoginApp()); // Utiliza LoginApp como widget principal
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) =>
+          AvatarProvider(), // Aquí es donde crearás tu clase de proveedor
+      child: LoginApp(),
+    ),
+  );
 }
 
 // Widget principal que representa la aplicación de inicio de sesión

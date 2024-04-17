@@ -1,15 +1,19 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
+import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
+import 'package:mi_app_optativa/src/Mocks/DescuentosMocks.dart';
 import 'package:mi_app_optativa/src/Models/Avatar.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/Descuentos_widgest.dart';
 import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
 import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
     as Menu;
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   final String username;
@@ -69,6 +73,7 @@ class _HomeState extends State<Home> implements CartObserver {
 
   @override
   Widget build(BuildContext context) {
+    final selectedAvatar = Provider.of<AvatarProvider>(context).selectedAvatar;
     return MaterialApp(
       theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
@@ -85,15 +90,14 @@ class _HomeState extends State<Home> implements CartObserver {
               ),
               SizedBox(width: 8),
               AvatarWidget(
-                // Nuevo
-                avatar: _selectedAvatar, // Nuevo
+                avatar:
+                    selectedAvatar, // Pasa el avatar seleccionado al AvatarWidget
                 onSelectAvatar: (avatar) {
-                  // Nuevo
-                  setState(() {
-                    _selectedAvatar = avatar;
-                  });
-                }, // Nuevo
-              ), // Nuevo
+                  Provider.of<AvatarProvider>(context, listen: false)
+                      .setSelectedAvatar(
+                          avatar); // Actualiza el avatar seleccionado en el proveedor
+                },
+              ),
             ],
           ),
           backgroundColor: isDarkMode
@@ -149,6 +153,15 @@ class _HomeState extends State<Home> implements CartObserver {
                       ? Color.fromARGB(255, 255, 255, 255)
                       : Colors.black,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height:
+                    120, // Especifica la altura deseada del DescuentosCarousel
+                child: DescuentosCarousel(
+                  descuentosList: datosDescuentosMock,
+                  interval: Duration(seconds: 3),
+                  imageSize: 10, // Tamaño de las imágenes en píxeles
                 ),
               ),
               SizedBox(height: 20),

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
-import 'package:mi_app_optativa/src/Pages/Cart.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
-import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
-import 'package:mi_app_optativa/src/Pages/RopaParaDama.dart';
-import 'package:mi_app_optativa/src/Pages/Tecnologia.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
+import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
+    as Menu;
+import 'package:provider/provider.dart';
 
 class RopaCaballero extends StatefulWidget {
   @override
@@ -19,6 +20,7 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
   List<Product> products = [];
   bool isDarkMode = false;
   int totalUniqueProducts = 0;
+
   final ProductService _productService = ProductService();
   @override
   void initState() {
@@ -84,15 +86,31 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final selectedAvatar = Provider.of<AvatarProvider>(context).selectedAvatar;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          ' Ropa',
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 30,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
+        title: Row(
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  right: 16), // Ajusta el margen derecho según sea necesario
+              child: Text(
+                ' Ropa Caballeros',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 30,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+            AvatarWidget(
+              avatar: selectedAvatar,
+              onSelectAvatar: (avatar) {
+                Provider.of<AvatarProvider>(context, listen: false)
+                    .setSelectedAvatar(avatar);
+              },
+            ),
+          ],
         ),
         backgroundColor: isDarkMode
             ? const Color.fromARGB(255, 61, 60, 60)
@@ -109,8 +127,9 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
           },
         ),
         actions: [
-          CustomPopupMenuButton(
-              isDarkMode: isDarkMode), // Muestra el menú desplegable
+          Menu.CustomPopupMenuButton(
+            isDarkMode: isDarkMode,
+          ),
         ],
       ),
       floatingActionButton: FloatingCartButton(
@@ -165,111 +184,6 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CustomPopupMenuButton extends StatelessWidget {
-  final bool isDarkMode;
-  const CustomPopupMenuButton({Key? key, required this.isDarkMode})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-        switch (value) {
-          case 'joyeria':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => joyeria()),
-            );
-            break;
-          case 'tecnologia':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => tecnologia()),
-            );
-            break;
-          case 'ropaCaballero': // Agregar la opción para la página RopaCaballero
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RopaCaballero()),
-            );
-            break;
-          case 'ropaDama':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RopaDama()),
-            );
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'joyeria',
-          child: Text(
-            'Joyería',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'tecnologia',
-          child: Text(
-            'Tecnología',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'ropaCaballero',
-          child: Text(
-            'Ropa Caballero',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'ropaDama',
-          child: Text(
-            'Ropa Dama',
-            style: TextStyle(
-              fontFamily: 'FredokaOne',
-              fontSize: 20,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-      ],
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              'Menú',
-              style: TextStyle(
-                fontFamily: 'FredokaOne',
-                fontSize: 20,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.arrow_drop_down,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ],
       ),
     );
   }
