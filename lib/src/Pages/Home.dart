@@ -29,7 +29,6 @@ class _HomeState extends State<Home> implements CartObserver {
   bool isDarkMode = false;
   int totalUniqueProducts = 0;
   final ProductService _productService = ProductService();
-  Avatar? _selectedAvatar;
 
   @override
   void initState() {

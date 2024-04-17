@@ -25,36 +25,32 @@ class CartController extends ChangeNotifier {
   }
 
   static void addToCart(BuildContext context, Product product, int quantity) {
-    _cartItems.firstWhereOrNull((item) => item.id == product.id);
     if (quantity >= 1) {
-      // Verifica si la cantidad es mayor que 1
-      _cartItems.add(product);
-
-      product.quantity = quantity; // Actualiza la cantidad del producto
-    } else if (product.quantity == 0) {
-      // Verifica si el producto ya está en el carrito
-      if (_cartItems.contains(product)) {
-        // Si ya está en el carrito, simplemente incrementa su cantidad en uno
-        product.quantity;
+      // Verifica si la cantidad es mayor o igual a 1
+      Product? existingProduct =
+          _cartItems.firstWhereOrNull((item) => item.id == product.id);
+      if (existingProduct != null) {
+        // Si el producto ya existe en el carrito, incrementa su cantidad
+        existingProduct.quantity += quantity;
       } else {
-        // Si no está en el carrito, agrégalo con cantidad uno
+        // Si el producto no existe en el carrito, agrégalo con la cantidad especificada
         _cartItems.add(product);
-        product.quantity = 1;
+        product.quantity = quantity;
       }
-    }
-    // Actualiza totalUniqueProducts
-    totalUniqueProducts = calculateTotalUniqueProducts(_cartItems);
+      // Actualiza totalUniqueProducts
+      totalUniqueProducts = calculateTotalUniqueProducts(_cartItems);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Agregado al carrito: ${product.title} x ${product.quantity}',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Agregado al carrito: ${product.title} x ${quantity}',
+          ),
+          duration: Duration(seconds: 1),
         ),
-        duration: Duration(seconds: 1),
-      ),
-    );
+      );
 
-    notifyCartUpdated();
+      notifyCartUpdated();
+    }
   }
 
   static void removeProduct(Product product) {

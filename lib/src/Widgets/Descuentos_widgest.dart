@@ -71,13 +71,16 @@ class _DescuentosCarouselState extends State<DescuentosCarousel> {
             _showImageFullScreen(context, descuento);
           },
           child: Container(
-            padding: EdgeInsets.all(10),
-            child: Image.network(
-              descuento.imagen,
-              fit: BoxFit.cover,
-              width: widget.imageSize,
-              height:
-                  widget.imageSize * 0.7, // Reduciendo la altura de la imagen
+            padding: EdgeInsets.all(0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                descuento.imagen,
+                fit: BoxFit.cover,
+                width: widget.imageSize,
+                height:
+                    widget.imageSize * 0.7, // Reduciendo la altura de la imagen
+              ),
             ),
           ),
         );
@@ -90,7 +93,13 @@ class _DescuentosCarouselState extends State<DescuentosCarousel> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Image.network(descuento.imagen),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          content: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(descuento.imagen),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {

@@ -57,25 +57,6 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
     }
   }
 
-  void addToCart(BuildContext context, Product product, int quantity) {
-    CartController.addToCart(context, product, quantity);
-  }
-
-  void incrementQuantity(Product product) {
-    CartController.incrementQuantity(product);
-
-    setState(() {
-      // Incrementa la cantidad del producto en la lista de productos
-    });
-  }
-
-  void decrementQuantity(Product product) {
-    CartController.decrementQuantity(product);
-    setState(() {
-      // Este setState actualizará automáticamente el widget después de decrementar la cantidad
-    });
-  }
-
   void _updateCartItemCount(int itemCount) {
     // Actualiza el estado de tu página o realiza cualquier otra acción necesaria con el contador del carrito
     setState(() {
@@ -175,9 +156,15 @@ class _RopaCaballeroState extends State<RopaCaballero> implements CartObserver {
                   return Cart.ProductCard(
                     product: product,
                     isDarkMode: isDarkMode,
-                    addToCart: addToCart,
-                    incrementQuantity: incrementQuantity,
-                    decrementQuantity: decrementQuantity,
+                    addToCart: (context, product, quantity) {
+                      CartController.addToCart(context, product, quantity);
+                    },
+                    incrementQuantity: (product) {
+                      CartController.incrementQuantity(product);
+                    },
+                    decrementQuantity: (product) {
+                      CartController.decrementQuantity(product);
+                    },
                   );
                 },
               ),

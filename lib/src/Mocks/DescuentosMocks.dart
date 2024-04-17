@@ -17,4 +17,12 @@ final List<Descuentos> datosDescuentosMock = [
       id: 4,
       imagen:
           'https://cdn.pixabay.com/photo/2016/03/21/20/04/black-1271449_1280.png'),
+  Descuentos(
+      id: 5,
+      imagen:
+          'https://media.istockphoto.com/id/1407287033/es/vector/mega-oferta-especial-de-venta-neon-10-off-sale-banner-promoci%C3%B3n-de-tablero-de-letreros-vector.jpg?s=612x612&w=0&k=20&c=Ta2q-cSotqjFhTXxfqFVvkpCNNldHAYVDHmyb3phDfI='),
+  Descuentos(
+      id: 6,
+      imagen:
+          'https://st2.depositphotos.com/1006899/7597/i/450/depositphotos_75976327-stock-photo-great-sales-and-discounts.jpg'),
 ];
