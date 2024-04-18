@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
+import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
+import 'package:provider/provider.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   final List<Product> products;
@@ -41,15 +44,28 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedAvatar = Provider.of<AvatarProvider>(context).selectedAvatar;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Carrito de compras',
-          style: TextStyle(
-            fontFamily: 'FredokaOne',
-            fontSize: 20,
-            color: widget.isDarkMode ? Colors.white : Colors.black,
-          ),
+        title: Row(
+          children: [
+            Text(
+              'Shopping Cart',
+              style: TextStyle(
+                fontFamily: 'FredokaOne',
+                fontSize: 20,
+                color: widget.isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(width: 8),
+            AvatarWidget(
+              avatar: selectedAvatar,
+              onSelectAvatar: (avatar) {
+                Provider.of<AvatarProvider>(context, listen: false)
+                    .setSelectedAvatar(avatar);
+              },
+            ),
+          ],
         ),
         backgroundColor: widget.isDarkMode
             ? const Color.fromARGB(255, 61, 60, 60)

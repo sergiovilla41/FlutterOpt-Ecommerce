@@ -4,7 +4,6 @@ import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
 import 'package:mi_app_optativa/src/Mocks/DescuentosMocks.dart';
-import 'package:mi_app_optativa/src/Models/Avatar.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
 import 'package:mi_app_optativa/src/Service/ProductosService.dart';
 import 'package:mi_app_optativa/src/Widgets/Descuentos_widgest.dart';
