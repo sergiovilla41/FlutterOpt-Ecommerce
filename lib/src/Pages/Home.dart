@@ -9,6 +9,7 @@ import 'package:mi_app_optativa/src/Service/ProductosService.dart';
 import 'package:mi_app_optativa/src/Widgets/Descuentos_widgest.dart';
 import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
 import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
+import 'package:mi_app_optativa/src/Widgets/floating_contact_button.dart';
 import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
 import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
     as Menu;
@@ -119,9 +120,20 @@ class _HomeState extends State<Home> implements CartObserver {
             ),
           ],
         ),
-        floatingActionButton: FloatingCartButton(
-          products: products,
-          isDarkMode: isDarkMode,
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingCartButton(
+              products: products,
+              isDarkMode: isDarkMode,
+            ),
+            SizedBox(height: 16),
+            ContactButton(
+              buttonColor: const Color.fromARGB(255, 58, 100, 59),
+              iconColor: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ],
         ),
         body: Container(
           decoration: BoxDecoration(

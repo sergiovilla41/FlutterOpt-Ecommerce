@@ -18,6 +18,7 @@ class FloatingCartButton extends StatelessWidget {
     return Stack(
       children: [
         FloatingActionButton(
+          heroTag: 'floatingCartButton', // Identificador único
           onPressed: () {
             Navigator.push(
               context,
@@ -25,9 +26,7 @@ class FloatingCartButton extends StatelessWidget {
                 builder: (context) => ShoppingCartPage(
                   products: products,
                   isDarkMode: isDarkMode,
-                  updateCartItemCount: (itemCount) {
-                    _updateCartItemCount(context, itemCount);
-                  },
+                  updateCartItemCount: (itemCount) {},
                 ),
               ),
             );
@@ -60,12 +59,5 @@ class FloatingCartButton extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  void _updateCartItemCount(BuildContext context, int itemCount) {
-    // Actualiza el estado de tu página o realiza cualquier otra acción necesaria con el contador del carrito
-    // Aquí puedes utilizar la lógica de actualización del carrito de compras
-    // Por ejemplo:
-    // CartController.addToCart(context, product, itemCount);
   }
 }

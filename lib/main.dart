@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Pages/AvatarPickerPage.dart';
+import 'package:mi_app_optativa/src/Pages/ContactanosPage.dart';
 import 'package:mi_app_optativa/src/Pages/Log_In.dart';
 import 'package:mi_app_optativa/src/Pages/Joyeria.dart';
 import 'package:mi_app_optativa/src/Pages/RopaParaCaballero.dart';
@@ -65,6 +66,7 @@ class LoginApp extends StatelessWidget {
         'RopaCaballero': (BuildContext context) => RopaCaballero(),
         'RopaDama': (BuildContext context) => RopaDama(),
         'AvatarPickerPage': (BuildContext context) => AvatarPickerPage(),
+        'Contactanos': (BuildContext context) => ContactFormWidget(),
       },
     );
   }
