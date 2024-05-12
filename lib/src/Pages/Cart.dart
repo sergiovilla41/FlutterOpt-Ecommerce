@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
+import 'package:mi_app_optativa/src/Pages/Pago_Pagina.dart';
 import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
+import 'package:mi_app_optativa/src/Widgets/pago_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:mi_app_optativa/src/Widgets/pago.dart';
+
 
 class ShoppingCartPage extends StatefulWidget {
   final List<Product> products;
@@ -46,23 +48,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   @override
   Widget build(BuildContext context) {
     final selectedAvatar = Provider.of<AvatarProvider>(context).selectedAvatar;
-    bool isOpen = false;
-    return Scaffold(floatingActionButton:
-        FilledButton(
-          onPressed: () {
-            setState(() {
-              isOpen = !isOpen;
-            });
-          },
-          child: Text(
-            'Pagar',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: widget.isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
+    return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
@@ -100,36 +86,34 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       body: _buildShoppingCartList(),
       bottomNavigationBar: BottomAppBar(
           child: //Row(children: [
-        Container(
-          padding: const EdgeInsets.all(16.0),
-          color: widget.isDarkMode
-              ? const Color.fromARGB(255, 61, 60, 60)
-              : const Color.fromARGB(207, 14, 73, 9),
-          child: Text(
-            'Total: \$${_calculateTotal().toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: widget.isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
+       Container(
+  padding: const EdgeInsets.all(16.0),
+  color: widget.isDarkMode
+      ? const Color.fromARGB(255, 61, 60, 60)
+      : const Color.fromARGB(207, 14, 73, 9),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        'Total: \$${_calculateTotal().toStringAsFixed(2)}',
+        style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.bold,
+          color: widget.isDarkMode ? Colors.white : Colors.black,
         ),
-        // ElevatedButton(
-        //   onPressed: () {
-        //     setState(() {
-        //       isOpen = !isOpen;
-        //     });
-        //   },
-        //   child: Text(
-        //     'Pagar',
-        //     style: TextStyle(
-        //       fontSize: 20.0,
-        //       fontWeight: FontWeight.bold,
-        //       color: widget.isDarkMode ? Colors.white : Colors.black,
-        //     ),
-        //   ),
-        // ),
-     // ])
+      ),
+      PaymentButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PaymentForm()),
+          );
+        }, color: widget.isDarkMode ? Color.fromARGB(255, 16, 88, 27) : Color.fromARGB(255, 89, 158, 84),
+      ),
+    ],
+  ),
+),
+
       ),
     );
   }
