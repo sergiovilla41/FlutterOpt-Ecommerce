@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
 import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
 import 'package:mi_app_optativa/src/Models/product.dart';
+import 'package:mi_app_optativa/src/Pages/Pago_Pagina.dart';
 import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
+import 'package:mi_app_optativa/src/Widgets/pago_widget.dart';
 import 'package:provider/provider.dart';
+
 
 class ShoppingCartPage extends StatefulWidget {
   final List<Product> products;
@@ -57,7 +60,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 color: widget.isDarkMode ? Colors.white : Colors.black,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             AvatarWidget(
               avatar: selectedAvatar,
               onSelectAvatar: (avatar) {
@@ -69,7 +72,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         ),
         backgroundColor: widget.isDarkMode
             ? const Color.fromARGB(255, 61, 60, 60)
-            : Color.fromARGB(207, 14, 73, 9),
+            : const Color.fromARGB(207, 14, 73, 9),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
@@ -82,20 +85,35 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
       ),
       body: _buildShoppingCartList(),
       bottomNavigationBar: BottomAppBar(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Total: \$${_calculateTotal().toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: widget.isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
+          child: //Row(children: [
+       Container(
+  padding: const EdgeInsets.all(16.0),
+  color: widget.isDarkMode
+      ? const Color.fromARGB(255, 61, 60, 60)
+      : const Color.fromARGB(207, 14, 73, 9),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        'Total: \$${_calculateTotal().toStringAsFixed(2)}',
+        style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.bold,
+          color: widget.isDarkMode ? Colors.white : Colors.black,
         ),
-        color: widget.isDarkMode
-            ? const Color.fromARGB(255, 61, 60, 60)
-            : Color.fromARGB(207, 14, 73, 9),
+      ),
+      PaymentButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PaymentForm()),
+          );
+        }, color: widget.isDarkMode ? Color.fromARGB(255, 16, 88, 27) : Color.fromARGB(255, 89, 158, 84),
+      ),
+    ],
+  ),
+),
+
       ),
     );
   }
@@ -110,12 +128,12 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
         gradient: LinearGradient(
           colors: widget.isDarkMode
               ? [
-                  Color.fromARGB(255, 36, 70, 36),
-                  Color.fromARGB(179, 22, 24, 23),
+                  const Color.fromARGB(255, 36, 70, 36),
+                  const Color.fromARGB(179, 22, 24, 23),
                 ]
               : [
-                  Color.fromARGB(255, 123, 153, 114),
-                  Color.fromARGB(0, 191, 255, 191),
+                  const Color.fromARGB(255, 123, 153, 114),
+                  const Color.fromARGB(0, 191, 255, 191),
                 ],
           begin: Alignment.topCenter,
         ),
@@ -135,7 +153,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     final productTotalPrice = product.price * product.quantity;
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 4,
       color: widget.isDarkMode ? Colors.grey[800] : Colors.white,
       child: ListTile(
