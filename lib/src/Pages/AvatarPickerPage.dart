@@ -14,22 +14,33 @@ class _AvatarPickerPageState extends State<AvatarPickerPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    // Define los colores y estilos para el AppBar y el FAB
+    Color appBarColor = isDarkMode
+        ? const Color.fromARGB(255, 61, 60, 60)
+        : Color.fromARGB(220, 8, 81, 177);
+    Color fabColor = isDarkMode
+        ? Color.fromARGB(255, 255, 255, 255)
+        : Color.fromARGB(220, 8, 81, 177);
+    Color iconColor =
+        isDarkMode ? Colors.white : const Color.fromARGB(255, 247, 247, 247);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Choose Avatar',
           style: TextStyle(
             fontFamily: 'FredokaOne',
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: isDarkMode
+                ? Colors.white
+                : const Color.fromARGB(255, 255, 255, 255),
           ),
         ),
-        backgroundColor: isDarkMode
-            ? const Color.fromARGB(255, 61, 60, 60)
-            : Color.fromARGB(207, 14, 73, 9), // Color del fondo del AppBar
+        backgroundColor: appBarColor,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: iconColor,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -45,8 +56,8 @@ class _AvatarPickerPageState extends State<AvatarPickerPage> {
                     Color.fromARGB(179, 22, 24, 23),
                   ]
                 : [
-                    Color.fromARGB(255, 123, 153, 114),
-                    Color.fromARGB(0, 191, 255, 191),
+                    Color.fromARGB(220, 8, 81, 177),
+                    Color.fromARGB(210, 97, 104, 136),
                   ],
             begin: Alignment.topCenter,
           ),
@@ -88,12 +99,10 @@ class _AvatarPickerPageState extends State<AvatarPickerPage> {
         onPressed: () {
           Navigator.pop(context, _selectedAvatar);
         },
-        backgroundColor: isDarkMode
-            ? Color.fromARGB(207, 14, 73, 9)
-            : Color.fromARGB(255, 123, 153, 114),
+        backgroundColor: fabColor,
         child: Icon(
           Icons.check,
-          color: isDarkMode ? Colors.white : Colors.black,
+          color: iconColor,
         ),
       ),
     );
