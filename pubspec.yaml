@@ -40,23 +40,10 @@ dependencies:
   provider: ^6.1.2
   collection: ^1.15.0
   flutter_blurhash: ^0.6.0
-  firebase_core: ^2.3.0
-  firebase_storage: ^11.6.0
-  firebase_auth: ^4.1.0 # Si también necesitas autenticación
-  image_picker: ^0.8.5+3
-  cloud_firestore: ^4.3.0
-  path_provider: ^2.0.2
-  cached_network_image: ^3.3.1
-  flutter_staggered_grid_view: ^0.7.0
-  flutter_image: ^4.1.11
-  
 
-  
-  
 dev_dependencies:
   flutter_test:
     sdk: flutter
-    
     
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -79,7 +66,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - galery/
     - images/
     
   #   - images/a_dot_ham.jpeg

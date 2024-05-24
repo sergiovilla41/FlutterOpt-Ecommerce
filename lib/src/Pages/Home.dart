@@ -1,25 +1,73 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mi_app_optativa/src/Controllers/AvatarController.dart';
-import 'package:mi_app_optativa/src/Service/FireBaseService.dart';
-import 'package:mi_app_optativa/src/Pages/UpLoadImages.dart';
-import 'package:mi_app_optativa/src/Widgets/full_screen.dart';
+import 'package:mi_app_optativa/src/Controllers/CarritoComprasController.dart';
+import 'package:mi_app_optativa/src/Interfaces/CartObserver.dart';
+import 'package:mi_app_optativa/src/Mocks/DescuentosMocks.dart';
+import 'package:mi_app_optativa/src/Models/product.dart';
+import 'package:mi_app_optativa/src/Service/ProductosService.dart';
+import 'package:mi_app_optativa/src/Widgets/Descuentos_widgest.dart';
+import 'package:mi_app_optativa/src/Widgets/avatar_widget.dart';
+import 'package:mi_app_optativa/src/Widgets/floating_cart_button.dart';
+import 'package:mi_app_optativa/src/Widgets/floating_contact_button.dart';
+import 'package:mi_app_optativa/src/Widgets/product_card.dart' as Cart;
+import 'package:mi_app_optativa/src/Widgets/custom_popup_menu_button.dart'
+    as Menu;
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
+  final String username;
+  Home({Key? key, required this.username, required String password})
+      : super(key: key);
+
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> implements CartObserver {
+  List<Product> products = [];
   bool isDarkMode = false;
-
-  late Future<List<String>> _fileNamesFuture;
+  int totalUniqueProducts = 0;
+  final ProductService _productService = ProductService();
 
   @override
   void initState() {
     super.initState();
-    _fileNamesFuture = FirebaseStorageService().fetchFileNames('images');
+    CartController.addObserver(this);
+    _loadProducts();
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void onCartUpdated() {
+    setState(() {
+      CartController.updateTotalUniqueProducts(CartController.getCartItems());
+    });
+  }
+
+  //Metodo para cargar los productos desde el Service
+  void _loadProducts() async {
+    try {
+      List<Product> fetchedProducts = await _productService.fetchProducts();
+      setState(() {
+        products = fetchedProducts;
+      });
+    } catch (e) {
+      // Handle error
+      print('Error fetching products: $e');
+    }
+  }
+
+  void _updateCartItemCount(int itemCount) {
+    // Actualiza el estado de tu página o realiza cualquier otra acción necesaria con el contador del carrito
+    setState(() {
+      // Actualiza el estado de tu widget con el nuevo número de ítems en el carrito
+    });
   }
 
   @override
@@ -31,32 +79,61 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           title: Row(
             children: [
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(right: 2),
-                  child: Text(
-                    'Galería',
-                    style: TextStyle(
-                      fontFamily: 'FredokaOne',
-                      fontSize: 22,
-                      color: isDarkMode ? Colors.white : Colors.white,
-                    ),
-                  ),
+              Text(
+                'User: ${widget.username}',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 20,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              // Agrega aquí tu widget AvatarWidget
+              SizedBox(width: 8),
+              AvatarWidget(
+                avatar:
+                    selectedAvatar, // Pasa el avatar seleccionado al AvatarWidget
+                onSelectAvatar: (avatar) {
+                  Provider.of<AvatarProvider>(context, listen: false)
+                      .setSelectedAvatar(
+                          avatar); // Actualiza el avatar seleccionado en el proveedor
+                },
+              ),
             ],
           ),
           backgroundColor: isDarkMode
-              ? Color.fromARGB(255, 61, 60, 60)
-              : Color.fromARGB(220, 8, 81, 177),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: isDarkMode ? Colors.white : Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+              ? const Color.fromARGB(255, 61, 60, 60)
+              : Color.fromARGB(207, 14, 73, 9),
+          actions: [
+            Menu.CustomPopupMenuButton(isDarkMode: isDarkMode),
+            SizedBox(width: 8),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  isDarkMode = !isDarkMode;
+                });
+              },
+              icon: Icon(
+                isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                color: isDarkMode
+                    ? Color.fromARGB(255, 236, 234, 234)
+                    : Color.fromARGB(255, 175, 167, 54),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingCartButton(
+              products: products,
+              isDarkMode: isDarkMode,
+            ),
+            SizedBox(height: 16),
+            ContactButton(
+              buttonColor: const Color.fromARGB(255, 58, 100, 59),
+              iconColor: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ],
         ),
         body: Container(
           decoration: BoxDecoration(
@@ -64,95 +141,63 @@ class _HomeState extends State<Home> {
               colors: isDarkMode
                   ? [
                       Color.fromARGB(255, 36, 70, 36),
-                      Color.fromARGB(179, 22, 24, 23)
+                      Color.fromARGB(179, 22, 24, 23),
                     ]
                   : [
-                      Color.fromARGB(255, 11, 90, 128),
-                      Color.fromARGB(0, 31, 28, 167)
+                      Color.fromARGB(255, 123, 153, 114),
+                      Color.fromARGB(0, 191, 255, 191),
                     ],
               begin: Alignment.topCenter,
             ),
           ),
-          child: FutureBuilder<List<String>>(
-            future: _fileNamesFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error al cargar los archivos'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No hay archivos disponibles'));
-              } else {
-                final imageFiles = snapshot.data!
-                    .where((fileName) =>
-                        fileName.endsWith('.jpg') ||
-                        fileName.endsWith('.png') ||
-                        fileName.endsWith('.jpeg'))
-                    .toList();
-                if (imageFiles.isEmpty) {
-                  return Center(
-                      child: Text('No hay archivos de imagen disponibles'));
-                }
-                return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        3, // Cambia este valor según el número de columnas que desees
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                  ),
-                  itemCount: imageFiles.length,
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Store',
+                style: TextStyle(
+                  fontFamily: 'FredokaOne',
+                  fontSize: 30,
+                  color: isDarkMode
+                      ? Color.fromARGB(255, 255, 255, 255)
+                      : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height:
+                    100, // Especifica la altura deseada del DescuentosCarousel
+                child: DescuentosCarousel(
+                  descuentosList: datosDescuentosMock,
+                  interval: Duration(seconds: 3),
+                  imageSize: 10, // Tamaño de las imágenes en píxeles
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: products.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final fileName = imageFiles[index];
-                    return FutureBuilder<String>(
-                      future: FirebaseStorageService()
-                          .getImageURL('images/$fileName'),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Icon(Icons.error));
-                        } else {
-                          final imageUrl = snapshot.data!;
-                          return imageUrl.isEmpty
-                              ? Center(child: Icon(Icons.error_outline))
-                              : GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FullImageScreen(
-                                          imageUrl: imageUrl,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error);
-                                    },
-                                  ),
-                                );
-                        }
+                    final product = products[index];
+                    return Cart.ProductCard(
+                      product: product,
+                      isDarkMode: isDarkMode,
+                      addToCart: (context, product, quantity) {
+                        CartController.addToCart(context, product, quantity);
+                      },
+                      incrementQuantity: (product) {
+                        CartController.incrementQuantity(product);
+                      },
+                      decrementQuantity: (product) {
+                        CartController.decrementQuantity(product);
                       },
                     );
                   },
-                );
-              }
-            },
+                ),
+              ),
+            ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ImageUploader()),
-            );
-          },
-          tooltip: 'Subir imagen',
-          child: Icon(Icons.folder),
         ),
       ),
     );
